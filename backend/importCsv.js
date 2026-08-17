@@ -1,5 +1,5 @@
-// Импорт базы блогеров из выгрузки Tilda (CSV) в data/bloggers.json
-// Использование: node importCsv.js /путь/к/выгрузке.csv
+// Импорт базы блогеров и брендов из выгрузки Tilda (CSV) в data/bloggers.json и data/brands.json
+// Использование: node importCsv.js /путь�/к/выгрузке.csv
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -43,6 +43,13 @@ function parseFollowers(text) {
   return Number.isFinite(num) ? num : null;
 }
 
+function parsePhone(text) {
+  if (!text) return null;
+  const cleaned = text.replace(/<br\s*\/?>/gi, " ");
+  const m = cleaned.match(/\+?\d[\d\s()\-]{8,}\d/);
+  return m ? m[0].trim() : null;
+}
+
 function shortenNiches(nicheField) {
   if (!nicheField) return [];
   return nicheField
@@ -52,46 +59,79 @@ function shortenNiches(nicheField) {
     .map((s) => s.replace(/\s*\([^)]*\)\s*$/, "").trim());
 }
 
+function stripHtml(text) {
+  if (!text) return null;
+  return text.replace(/<br\s*\/?>/gi, " ").replace(/<[^>]+>/g, "").trim() || null;
+}
+
 const bloggers = [];
-let skipped = 0;
+const brands = [];
+let skippedBloggers = 0;
+let skippedBrands = 0;
 
 for (const row of records) {
   const category = (row["Category"] || "").trim();
-  if (category !== "Блогеры") continue;
-
   const name = (row["Title"] || "").trim();
   const city = (row["Characteristics:Город"] || "").trim();
-  const platform = (row["Characteristics:Платформа"] || "").trim();
   const nicheField = row["Characteristics:Сфера (тематика)"] || "";
   const text = row["Text"] || "";
-
-  const followers = parseFollowers(text);
   const niches = shortenNiches(nicheField);
-  const contact = platformUrl(name, platform);
 
-  if (!name || !city) {
-    skipped++;
-    continue;
+  if (category === "Блогеры") {
+    const platform = (row["Characteristics:Платформа"] || "").trim();
+    const followers = parseFollowers(text);
+    const contact = platformUrl(name, platform);
+
+    if (!name || !city) {
+      skippedBloggers++;
+      continue;
+    }
+
+    bloggers.push({
+      name,
+      city,
+      niche: niches,
+      followers: followers,
+      platform: platform || null,
+      price_from: null, // отсутствует в исходной выгрузке
+      engagement: null, // отсутствует в исходной выгрузке
+      // Возможные значения: paid_collab (реклама за деньги), barter (готов на бартер),
+      // cross_promo_with_blogger (кросс-промо с другим блогером). По умолчанию считаем,
+      // что блогер открыт к платным коллабам — в исходной выгрузке этого поля нет.
+      looking_for: ["paid_collab"],
+      barter_interest: null, // чего хочет взамен бартером — нет в исходной выгрузке
+      contact: contact, // ссылка на соцсеть = прямой контакт
+      profile_url: contact,
+      photo: row["Photo"] || null,
+    });
+  } else if (category === "Бренды") {
+    const phone = parsePhone(text);
+    const description = stripHtml(text);
+
+    if (!name || !city) {
+      skippedBrands++;
+      continue;
+    }
+
+    brands.push({
+      name,
+      city,
+      niche: niches,
+      offer_type: "деньги", // не указано в исходной выгрузке, деньги — дефолт по умолчанию
+      budget_from: null, // отсутствует в исходной выгрузке
+      contact: phone,
+      description,
+    });
   }
-
-  bloggers.push({
-    name,
-    city,
-    niche: niches,
-    followers: followers,
-    platform: platform || null,
-    price_from: null, // отсутствует в исходной выгрузке
-    engagement: null, // отсутствует в исходной выгрузке
-    contact: contact, // ссылка на соцсеть = прямой контакт
-    profile_url: contact,
-    photo: row["Photo"] || null,
-  });
 }
 
-const outPath = path.join(__dirname, "data", "bloggers.json");
-fs.mkdirSync(path.dirname(outPath), { recursive: true });
-fs.writeFileSync(outPath, JSON.stringify(bloggers, null, 2), "utf-8");
+const bloggersOut = path.join(__dirname, "data", "bloggers.json");
+const brandsOut = path.join(__dirname, "data", "brands.json");
+fs.mkdirSync(path.dirname(bloggersOut), { recursive: true });
+fs.writeFileSync(bloggersOut, JSON.stringify(bloggers, null, 2), "utf-8");
+fs.writeFileSync(brandsOut, JSON.stringify(brands, null, 2), "utf-8");
 
-console.log(`Импортировано блогеров: ${bloggers.length}`);
-console.log(`Пропущено (нет имени/города): ${skipped}`);
-console.log(`Сохранено в: ${outPath}`);
+console.log(`Импортировано блогеров: ${bloggers.length} (пропущено: ${skippedBloggers})`);
+console.log(`Импортировано брендов: ${brands.length} (пропущено: ${skippedBrands})`);
+console.log(`Сохранено в: ${bloggersOut}`);
+console.log(`Сохранено в: ${brandsOut}`);

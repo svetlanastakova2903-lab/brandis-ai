@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Подбор от AI Brandis</title>
+<style>
+  :root{
+    --brandis-orange:#FF6B4A;
+    --brandis-cream:#FFF6EE;
+    --brandis-dark:#2B2320;
+    --brandis-brown:#8A6B52;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:transparent;}
+
+  #brandis-launcher{
+    position:fixed; right:22px; bottom:22px; z-index:999999;
+    width:62px; height:62px; border-radius:50%;
+    background:linear-gradient(135deg,#FF6B4A,#FF8C63);
+    box-shadow:0 8px 24px rgba(255,107,74,0.4);
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer; border:none; transition:transform .2s ease;
+  }
+  #brandis-launcher:hover{transform:scale(1.06);}
+  #brandis-launcher svg{width:28px;height:28px;}
+
+  #brandis-window{
+    position:fixed; right:22px; bottom:96px; z-index:999999;
+    width:360px; max-width:92vw; height:520px; max-height:78vh;
+    background:var(--brandis-cream);
+    border-radius:20px;
+    box-shadow:0 16px 48px rgba(43,35,32,0.25);
+    display:none; flex-direction:column; overflow:hidden;
+    border:1px solid rgba(138,107,82,0.15);
+  }
+  #brandis-window.open{display:flex;}
+
+  #brandis-header{
+    background:linear-gradient(135deg,#FF6B4A,#FF8C63);
+    color:#fff; padding:16px 18px; display:flex; align-items:center; gap:10px;
+  }
+  #brandis-header .title{font-weight:700; font-size:15px;}
+  #brandis-header .subtitle{font-size:12px; opacity:.9; margin-top:2px;}
+  #brandis-close{margin-left:auto; background:none; border:none; color:#fff; font-size:20px; cursor:pointer; opacity:.85;}
+  #brandis-close:hover{opacity:1;}
+
+  #brandis-messages{
+    flex:1; overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:10px;
+  }
+  .brandis-msg{max-width:82%; padding:10px 14px; border-radius:16px; font-size:14px; line-height:1.45; white-space:pre-wrap;}
+  .brandis-msg.bot{
+    background:#fff; color:var(--brandis-dark); align-self:flex-start;
+    border-bottom-left-radius:4px; box-shadow:0 2px 6px rgba(43,35,32,0.06);
+  }
+  .brandis-msg.user{
+    background:var(--brandis-orange); color:#fff; align-self:flex-end;
+    border-bottom-right-radius:4px;
+  }
+  .brandis-msg.typing{color:var(--brandis-brown); font-style:italic;}
+
+  #brandis-inputbar{
+    display:flex; gap:8px; padding:12px; background:#fff; border-top:1px solid rgba(138,107,82,0.12);
+  }
+  #brandis-input{
+    flex:1; border:1px solid rgba(138,107,82,0.25); border-radius:14px; padding:10px 14px;
+    font-size:14px; outline:none; resize:none; font-family:inherit;
+  }
+  #brandis-input:focus{border-color:var(--brandis-orange);}
+  #brandis-send{
+    background:var(--brandis-orange); border:none; color:#fff; border-radius:14px;
+    width:42px; height:42px; cursor:pointer; display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
+  }
+  #brandis-send:disabled{opacity:.5; cursor:default;}
+
+  #brandis-window::-webkit-scrollbar{width:6px;}
+  #brandis-messages::-webkit-scrollbar-thumb{background:rgba(138,107,82,0.25); border-radius:4px;}
+</style>
+</head>
+<body>
+
+<button id="brandis-launcher" aria-label="Открыть подбор блогеров">
+  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M12 3C7.03 3 3 6.58 3 11c0 2.39 1.19 4.53 3.08 6.02-.1.86-.5 2.16-1.62 3.48 0 0 2.13-.16 4.02-1.6 1.06.36 2.24.6 3.52.6 4.97 0 9-3.58 9-8s-4.03-8-9-8z" fill="white"/>
+  </svg>
+</button>
+
+<div id="brandis-window">
+  <div id="brandis-header">
+    <div>
+      <div class="title">Подбор от AI Brandis</div>
+      <div class="subtitle">Найду блогера под твою задачу за пару вопросов</div>
+    </div>
+    <button id="brandis-close" aria-label="Закрыть">×</button>
+  </div>
+  <div id="brandis-messages"></div>
+  <div id="brandis-inputbar">
+    <textarea id="brandis-input" rows="1" placeholder="Например: нужен фуд-блогер в Рязани до 30к подписчиков"></textarea>
+    <button id="brandis-send" aria-label="Отправить">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M3 20l18-8L3 4v6l12 2-12 2v6z" fill="white"/></svg>
+    </button>
+  </div>
+</div>
+
+<script>
+  // Укажи адрес своего задеплоенного бэкенда:
+  const BRANDIS_API_URL = window.BRANDIS_API_URL || "https://YOUR-BACKEND-URL.onrender.com/api/chat";
+
+  const launcher = document.getElementById("brandis-launcher");
+  const win = document.getElementById("brandis-window");
+  const closeBtn = document.getElementById("brandis-close");
+  const messagesEl = document.getElementById("brandis-messages");
+  const input = document.getElementById("brandis-input");
+  const sendBtn = document.getElementById("brandis-send");
+
+  let history = [];
+  let opened = false;
+
+  function addMessage(role, text){
+    const div = document.createElement("div");
+    div.className = "brandis-msg " + (role === "user" ? "user" : "bot");
+    div.textContent = text;
+    messagesEl.appendChild(div);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+    return div;
+  }
+
+  function greet(){
+    if (messagesEl.children.length === 0){
+      addMessage("bot", "Привет! Я помогу подобрать блогера из базы Brandis 🙂\nНапиши, кого ищешь — например: город, ниша, бюджет или число подписчиков.");
+    }
+  }
+
+  launcher.addEventListener("click", () => {
+    opened = !opened;
+    win.classList.toggle("open", opened);
+    if (opened){ greet(); input.focus(); }
+  });
+  closeBtn.addEventListener("click", () => { opened = false; win.classList.remove("open"); });
+
+  async function send(){
+    const text = input.value.trim();
+    if (!text) return;
+    input.value = "";
+    sendBtn.disabled = true;
+    addMessage("user", text);
+    history.push({ role: "user", content: text });
+
+    const typingEl = addMessage("bot", "печатает…");
+    typingEl.classList.add("typing");
+
+    try {
+      const res = await fetch(BRANDIS_API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages: history }),
+      });
+      const data = await res.json();
+      typingEl.remove();
+      const reply = data.reply || "Извини, не получилось ответить. Попробуй ещё раз.";
+      addMessage("bot", reply);
+      history.push({ role: "assistant", content: reply });
+    } catch (e) {
+      typingEl.remove();
+      addMessage("bot", "Не получилось связаться с сервером. Попробуй чуть позже.");
+    } finally {
+      sendBtn.disabled = false;
+    }
+  }
+
+  sendBtn.addEventListener("click", send);
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && !e.shiftKey){
+      e.preventDefault();
+      send();
+    }
+  });
+</script>
+</body>
+</html>

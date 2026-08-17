@@ -90,7 +90,7 @@
   <div id="brandis-header">
     <div>
       <div class="title">Подбор от AI Brandis</div>
-      <div class="subtitle">Найду блогера под твою задачу за пару вопросов</div>
+      <div class="subtitle">Найду блогера и бренд под твою задачу за пару вопросов</div>
     </div>
     <button id="brandis-close" aria-label="Закрыть">×</button>
   </div>
@@ -105,7 +105,7 @@
 
 <script>
   // Укажи адрес своего задеплоенного бэкенда:
-    const BRANDIS_API_URL = window.BRANDIS_API_URL || "/api/chat";
+  const BRANDIS_API_URL = window.BRANDIS_API_URL || "/api/chat";
 
   const launcher = document.getElementById("brandis-launcher");
   const win = document.getElementById("brandis-window");
@@ -128,7 +128,7 @@
 
   function greet(){
     if (messagesEl.children.length === 0){
-      addMessage("bot", "Привет! Я помогу подобрать блогера из базы Brandis 🙂\nНапиши, кого ищешь — например: город, ниша, бюджет или число подписчиков.");
+      addMessage("bot", "Привет! Я помогу подобрать блогера и бренд из базы Brandis 🙂\nНапиши, кого ищешь — например: город, ниша или число подписчиков.");
     }
   }
 
@@ -179,3 +179,4 @@
 </script>
 </body>
 </html>
+

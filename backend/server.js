@@ -4,7 +4,14 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import dotenv from "dotenv";
+import crypto from "crypto";
 import Anthropic from "@anthropic-ai/sdk";
+
+import * as db from "./db.js";
+import * as billing from "./billing.js";
+import * as yookassa from "./yookassa.js";
+import * as telegram from "./telegram.js";
+import * as history from "./history.js";
 
 dotenv.config();
 
@@ -17,6 +24,9 @@ const PORT = process.env.PORT || 3000;
 const DATA_MODE = process.env.DATA_MODE || "test"; // "test" | "real"
 const PREFILTER_THRESHOLD = 200;
 const MAX_CANDIDATES_TO_MODEL = 40;
+// Публичный адрес этого сервиса — нужен для return_url платежей ЮKassa.
+// На Render это https://brandis-ai.onrender.com (или свой домен, если подключишь).
+const PUBLIC_BASE_URL = process.env.PUBLIC_BASE_URL || "http://localhost:" + PORT;
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
@@ -37,7 +47,7 @@ let BLOGGERS = loadJson("bloggers.json", "bloggers.test.json");
 let BRANDS = loadJson("brands.json", "brands.test.json");
 console.log(`Загружено (${DATA_MODE}): блогеров ${BLOGGERS.length}, брендов ${BRANDS.length}`);
 
-// ---------- Логирование диалогов ----------
+// ---------- Логирование диалогов (старый плоский лог, для обратной совместимости с /api/chat v1) ----------
 const LOG_FILE = path.join(__dirname, "logs.jsonl");
 function logInteraction(entry) {
   fs.appendFile(LOG_FILE, JSON.stringify({ ts: new Date().toISOString(), ...entry }) + "\n", () => {});
@@ -109,8 +119,8 @@ function prefilterEntities(all, messages, { isBlogger }) {
   return candidates.slice(0, MAX_CANDIDATES_TO_MODEL);
 }
 
-// ---------- System prompt ----------
-function buildSystemPrompt(bloggerCandidates, brandCandidates) {
+// ---------- System prompt (общая часть для v1 и v2) ----------
+function buildBaseSystemPrompt(bloggerCandidates, brandCandidates) {
   return `Ты — AI-помощник маркетплейса инфлюенсер-маркетинга Brandis (Россия, фокус: Москва, Санкт-Петербург, Рязань и другие города РФ).
 
 Твоя задача — сводить друг с другом три типа пользователей:
@@ -133,7 +143,7 @@ function buildSystemPrompt(bloggerCandidates, brandCandidates) {
 5. Пиши порусски, коротко, дружелюбно, как локальный эксперт, а не корпоративный бот. Без markdown-таблиц, без излишнего форматирования — обычным текстом, можно с эмодзи изредка.
 6. Если у блогера/бренда не указана цена, бюджет или engagement — не выдумывай их, просто не упоминай эти поля.
 7. Всегда указывай контакт, если он есть в данных, чтобы пользователь мог написать напрямую.
-8. ВАЖНМ: в каждой рекомендации явно указывай формат сотрудничества — "💰 деньги", "🔄 бартер" или "🤝 кросс-промо" — чтобы не было путаницы, что предлагается.
+8. ВАЖНО: в каждой рекомендации явно указывай формат сотрудничества — "💰 деньги", "🔄 бартер" или "🤝 кросс-промо" — чтобы не было путаницы, что предлагается.
 
 БАЗА БЛОГГЕРОВ (JSON, для сценариев 1 и 3):
 ${JSON.stringify(bloggerCandidates, null, 0)}
@@ -142,7 +152,42 @@ ${JSON.stringify(bloggerCandidates, null, 0)}
 ${JSON.stringify(brandCandidates, null, 0)}`;
 }
 
-// ---------- API ----------
+// v2 добавляет: краткое саммари предыдущей истории (если есть) + обязательный вызов инструмента
+// deliver_recommendations при выдаче итоговой подборки — это единственный надёжный сигнал
+// "поиск завершён" для биллинга (считаем по нему, а не по количеству сообщений).
+function buildSystemPromptV2(bloggerCandidates, brandCandidates, summary) {
+  const base = buildBaseSystemPrompt(bloggerCandidates, brandCandidates);
+  const summaryBlock = summary
+    ? `\n\nКОНТЕКСТ ПРЕДЫДУЩЕГО ДИАЛОГА С ЭТИМ ПОЛЬЗОВАТЕЛЕМ (сжатое саммари более ранней переписки, самые новые сообщения ниже идут дословно):\n${summary}`
+    : "";
+  const toolRule = `\n\n9. ОБЯЗАТЕЛЬНО: когда даёшь пользователю ИТОГОВУЮ подборку (2-5 вариантов, правило 4) — В ТОМ ЖЕ ОТВЕТЕ вызови инструмент deliver_recommendations с указанием intent и count, ПОМИМО обычного текстового ответа. Если вместо подборки задаёшь уточняющий вопрос или говоришь, что вариантов нет — НЕ вызывай инструмент.`;
+  return base + summaryBlock + toolRule;
+}
+
+const DELIVER_RECOMMENDATIONS_TOOL = {
+  name: "deliver_recommendations",
+  description:
+    "Вызови КАЖДЫЙ РАЗ, когда даёшь пользователю итоговую подборку блогеров/брендов (не уточняющий вопрос и не сообщение об отсутствии вариантов).",
+  input_schema: {
+    type: "object",
+    properties: {
+      intent: {
+        type: "string",
+        enum: ["brand_to_blogger", "blogger_to_brand", "blogger_to_blogger"],
+        description: "Какой из трёх сценариев сработал в этой подборке",
+      },
+      count: { type: "integer", description: "Сколько вариантов рекомендовано в этом ответе" },
+    },
+    required: ["intent", "count"],
+  },
+};
+
+// =========================================================================================
+// v1 — СТАРЫЙ эндпоинт, без биллинга и авторизации. Оставлен как есть для обратной совместимости
+// со встроенным виджетом frontend/widget.html, который пока ещё может быть встроен на Tilda.
+// Как только сайт полностью перейдёт на новую страницу чата (frontend/chat.html) — можно удалить
+// и этот эндпоинт, и старый виджет.
+// =========================================================================================
 app.post("/api/chat", async (req, res) => {
   try {
     const { messages } = req.body;
@@ -152,7 +197,7 @@ app.post("/api/chat", async (req, res) => {
 
     const bloggerCandidates = prefilterEntities(BLOGGERS, messages, { isBlogger: true });
     const brandCandidates = prefilterEntities(BRANDS, messages, { isBlogger: false });
-    const system = buildSystemPrompt(bloggerCandidates, brandCandidates);
+    const system = buildBaseSystemPrompt(bloggerCandidates, brandCandidates);
 
     const claudeMessages = messages
       .filter((m) => m.role === "user" || m.role === "assistant")
@@ -185,7 +230,13 @@ app.post("/api/chat", async (req, res) => {
 });
 
 app.get("/api/health", (req, res) => {
-  res.json({ ok: true, dataMode: DATA_MODE, bloggersCount: BLOGGERS.length, brandsCount: BRANDS.length });
+  res.json({
+    ok: true,
+    dataMode: DATA_MODE,
+    bloggersCount: BLOGGERS.length,
+    brandsCount: BRANDS.length,
+    dbConfigured: !!db.pool,
+  });
 });
 
 app.get("/api/logs", (req, res) => {
@@ -196,8 +247,274 @@ app.get("/api/logs", (req, res) => {
   res.json(last);
 });
 
+// =========================================================================================
+// v2 — НОВЫЙ флоу: привязка через Telegram, лимиты, оплата (ЮKassa), персистентная история.
+// Используется новой страницей frontend/chat.html.
+// =========================================================================================
+
+function billingSnapshot(user) {
+  return {
+    subscriptionStatus: user.subscription_status,
+    searchesUsedThisPeriod: user.searches_used_this_period,
+    subscriptionIncludedSearches: billing.SUBSCRIPTION_INCLUDED_SEARCHES,
+    addonSearchesRemaining: user.addon_searches_remaining,
+    freeSearchUsed: user.free_search_used,
+    subscriptionPeriodEnd: user.subscription_period_end,
+  };
+}
+
+// Достаёт access_token из заголовка Authorization: Bearer <token>, либо из тела/query (проще для
+// фронтенда без сложных http-клиентов), находит по нему пользователя и кладёт в req.user/req.telegramId.
+// telegram_id САМ ПО СЕБЕ нигде ниже как удостоверение личности не принимается — только этот токен,
+// иначе любой, кто узнал чужой telegram_id, мог бы читать чужую историю переписки и статус подписки.
+async function requireAuth(req, res, next) {
+  try {
+    const bearer = (req.headers.authorization || "").replace(/^Bearer\s+/i, "");
+    const token = bearer || req.body?.access_token || req.query?.access_token;
+    if (!token) return res.status(401).json({ error: "Требуется авторизация (access_token)." });
+    const user = await db.getUserByAccessToken(token);
+    if (!user) return res.status(401).json({ error: "Недействительный токен, войдите заново." });
+    req.user = user;
+    req.telegramId = user.telegram_id;
+    next();
+  } catch (err) {
+    console.error("Ошибка requireAuth:", err);
+    res.status(500).json({ error: "Ошибка авторизации." });
+  }
+}
+
+// ---------- Авторизация через Telegram ----------
+app.post("/api/auth/start", async (req, res) => {
+  try {
+    const sessionCode = req.body?.session_code || crypto.randomUUID();
+    await db.createPendingLink(sessionCode);
+    const botUsername = await telegram.getBotUsername();
+    res.json({ session_code: sessionCode, bot_username: botUsername });
+  } catch (err) {
+    console.error("Ошибка /api/auth/start:", err);
+    res.status(500).json({ error: "Не удалось начать авторизацию." });
+  }
+});
+
+app.get("/api/auth/status", async (req, res) => {
+  try {
+    const sessionCode = req.query.session_code;
+    if (!sessionCode) return res.status(400).json({ error: "session_code обязателен" });
+    const link = await db.getPendingLink(sessionCode);
+    if (!link) return res.status(404).json({ error: "Ссылка не найдена или устарела" });
+    if (link.linked_at) {
+      const user = await db.getUser(link.telegram_id);
+      return res.json({ linked: true, access_token: user?.access_token || null });
+    }
+    res.json({ linked: false });
+  } catch (err) {
+    console.error("Ошибка /api/auth/status:", err);
+    res.status(500).json({ error: "Не удалось проверить статус авторизации." });
+  }
+});
+
+// Вебхук от Telegram — получает /start <session_code> и привязывает telegram_id к сессии.
+app.post("/api/telegram/webhook", async (req, res) => {
+  try {
+    await telegram.handleUpdate(req.body, {
+      onStartLink: async ({ sessionCode, telegramId, username, firstName }) => {
+        const link = await db.getPendingLink(sessionCode);
+        if (!link) return { linked: false };
+        let user = await db.getOrCreateUser(telegramId, { username, firstName });
+        if (!user.access_token) {
+          user = await db.updateUser(telegramId, { access_token: crypto.randomUUID() + crypto.randomUUID() });
+        }
+        const updated = await db.completePendingLink(sessionCode, telegramId);
+        return { linked: !!updated };
+      },
+    });
+  } catch (err) {
+    console.error("Ошибка обработки Telegram webhook:", err);
+  }
+  // Telegram ожидает быстрый 200 в любом случае, иначе будет повторять доставку.
+  res.sendStatus(200);
+});
+
+// ---------- Бутстрап страницы чата: история + текущий статус биллинга ----------
+app.get("/api/chat/bootstrap", requireAuth, async (req, res) => {
+  try {
+    const telegramId = req.telegramId;
+    const messages = await db.getAllMessages(telegramId);
+    res.json({
+      history: messages.map((m) => ({ role: m.role, content: m.content })),
+      billing: billingSnapshot(req.user),
+    });
+  } catch (err) {
+    console.error("Ошибка /api/chat/bootstrap:", err);
+    res.status(500).json({ error: "Не удалось загрузить историю." });
+  }
+});
+
+// ---------- Основной чат v2: с лимитами и биллингом ----------
+app.post("/api/v2/chat", requireAuth, async (req, res) => {
+  try {
+    const telegramId = req.telegramId;
+    const message = (req.body?.message || "").toString().trim();
+    if (!message) return res.status(400).json({ error: "message обязателен" });
+
+    // Оппортунистическое продление подписок, чей период закончился — см. billing.sweepDueRenewals.
+    await billing.sweepDueRenewals();
+
+    let user = await db.getUser(telegramId); // перечитываем — sweepDueRenewals могла обновить состояние
+
+    const access = billing.checkAccess(user);
+    if (!access.allowed) {
+      return res.status(402).json({
+        error: "limit_reached",
+        reason: access.reason,
+        message: access.message,
+        cta: access.cta,
+        billing: billingSnapshot(user),
+      });
+    }
+
+    const { summary, recentMessages } = await history.getContextForUser(telegramId);
+    const messagesForPrefilter = [...recentMessages, { role: "user", content: message }];
+
+    const bloggerCandidates = prefilterEntities(BLOGGERS, messagesForPrefilter, { isBlogger: true });
+    const brandCandidates = prefilterEntities(BRANDS, messagesForPrefilter, { isBlogger: false });
+    const system = buildSystemPromptV2(bloggerCandidates, brandCandidates, summary);
+
+    const claudeMessages = [...recentMessages, { role: "user", content: message }];
+
+    const response = await anthropic.messages.create({
+      model: "claude-sonnet-4-6",
+      max_tokens: 800,
+      system,
+      messages: claudeMessages,
+      tools: [DELIVER_RECOMMENDATIONS_TOOL],
+    });
+
+    const replyText = response.content
+      .filter((b) => b.type === "text")
+      .map((b) => b.text)
+      .join("\n");
+
+    const toolUse = response.content.find((b) => b.type === "tool_use" && b.name === "deliver_recommendations");
+    const searchCompleted = !!toolUse;
+
+    if (searchCompleted) {
+      await billing.recordSearchCompleted(telegramId, {
+        billedAs: access.billedAs,
+        intent: toolUse.input?.intent,
+        model: "claude-sonnet-4-6",
+        inputTokens: response.usage?.input_tokens,
+        outputTokens: response.usage?.output_tokens,
+      });
+      user = await db.getUser(telegramId); // обновлённые счётчики для ответа
+    }
+
+    res.json({
+      reply: replyText || "Извини, не получилось сформулировать ответ. Попробуй переформулировать запрос.",
+      searchCompleted,
+      billing: billingSnapshot(user),
+    });
+
+    // Сохранение истории и (при необходимости) пересжатие саммари — после ответа, не блокируя пользователя.
+    history.appendExchangeAndMaybeSummarize(telegramId, message, replyText || "").catch((err) => {
+      console.error(`Не удалось сохранить историю для telegram_id=${telegramId}:`, err);
+    });
+  } catch (err) {
+    console.error("Ошибка /api/v2/chat:", err);
+    res.status(500).json({ error: "Что-то пошло не так. Попробуй ещё раз чуть позже." });
+  }
+});
+
+// ---------- Оплата: ЮKassa ----------
+app.post("/api/billing/subscribe", requireAuth, async (req, res) => {
+  try {
+    const returnUrl = `${PUBLIC_BASE_URL}/chat.html?payment=return`;
+    const confirmationUrl = await billing.startSubscription(req.telegramId, returnUrl);
+    res.json({ confirmation_url: confirmationUrl });
+  } catch (err) {
+    console.error("Ошибка /api/billing/subscribe:", err);
+    res.status(500).json({ error: "Не удалось создать платёж подписки." });
+  }
+});
+
+app.post("/api/billing/addon", requireAuth, async (req, res) => {
+  try {
+    const returnUrl = `${PUBLIC_BASE_URL}/chat.html?payment=return`;
+    const confirmationUrl = await billing.startAddonPurchase(req.telegramId, returnUrl);
+    res.json({ confirmation_url: confirmationUrl });
+  } catch (err) {
+    console.error("Ошибка /api/billing/addon:", err);
+    res.status(400).json({ error: err.message || "Не удалось создать платёж за пакет." });
+  }
+});
+
+app.get("/api/billing/status", requireAuth, async (req, res) => {
+  try {
+    res.json({ billing: billingSnapshot(req.user) });
+  } catch (err) {
+    console.error("Ошибка /api/billing/status:", err);
+    res.status(500).json({ error: "Не удалось получить статус." });
+  }
+});
+
+// Вебхук ЮKassa. Всегда отвечаем 200 при штатной обработке (успешной ИЛИ неуспешной оплате) —
+// ЮKassa не разбирает тело/заголовки ответа, ей важен только статус-код. При ЛЮБОЙ ошибке нашей
+// обработки отвечаем 5xx — тогда ЮKassa повторит доставку в течение 24 часов, и мы не потеряем платёж.
+app.post("/api/billing/webhook", async (req, res) => {
+  try {
+    const forwardedFor = (req.headers["x-forwarded-for"] || "").split(",")[0].trim() || req.socket.remoteAddress;
+    if (!yookassa.isYookassaIp(forwardedFor)) {
+      console.warn("Вебхук ЮKassa с неожиданного IP (обрабатываю всё равно, полагаясь на проверку статуса ниже):", forwardedFor);
+    }
+
+    const objId = req.body?.object?.id;
+    if (!objId) return res.sendStatus(200); // не похоже на платёжное уведомление — игнорируем
+
+    // Не доверяем телу вебхука напрямую — авторитетно перепроверяем статус в самой ЮKassa.
+    const payment = await yookassa.getPayment(objId);
+
+    const existing = await db.getPaymentByYookassaId(payment.id);
+    if (existing && existing.status === payment.status) {
+      return res.sendStatus(200); // уже обработан этот статус — идемпотентность на повторную доставку
+    }
+
+    await db.updatePaymentStatus(payment.id, payment.status, payment);
+
+    if (payment.status === "succeeded") {
+      await billing.applySucceededPayment(payment);
+    } else if (payment.status === "canceled") {
+      await billing.applyFailedPayment(payment);
+    }
+
+    res.sendStatus(200);
+  } catch (err) {
+    console.error("Ошибка обработки вебхука ЮKassa:", err);
+    res.sendStatus(500); // просим ЮKassa повторить доставку позже
+  }
+});
+
 app.use(express.static(path.join(__dirname, "..", "frontend")));
 
-app.listen(PORT, () => {
-  console.log(`Brandis AI backend запущен на порту ${PORT}`);
-});
+async function start() {
+  try {
+    await db.initSchema();
+  } catch (err) {
+    console.error("Не удалось инициализировать схему БД (проверь DATABASE_URL):", err);
+  }
+
+  if (process.env.TELEGRAM_BOT_TOKEN) {
+    try {
+      // Идемпотентно — safe вызывать при каждом старте (а на бесплатном Render это бывает часто).
+      await telegram.setWebhook(`${PUBLIC_BASE_URL}/api/telegram/webhook`);
+      console.log("Telegram webhook зарегистрирован на", `${PUBLIC_BASE_URL}/api/telegram/webhook`);
+    } catch (err) {
+      console.error("Не удалось зарегистрировать Telegram webhook:", err);
+    }
+  }
+
+  app.listen(PORT, () => {
+    console.log(`Brandis AI backend запущен на порту ${PORT}`);
+  });
+}
+
+start();

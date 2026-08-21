@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AI-подбор Brandis — чат</title>
+<style>
+  :root{
+    --brandis-orange:#FF6B4A;
+    --brandis-cream:#FFF6EE;
+    --brandis-dark:#2B2320;
+    --brandis-brown:#8A6B52;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;margin:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--brandis-cream);
+    display:flex; flex-direction:column;
+  }
+
+  #page{
+    max-width:640px; width:100%; margin:0 auto; height:100vh;
+    display:flex; flex-direction:column; background:#fff;
+    box-shadow:0 0 40px rgba(43,35,32,0.08);
+  }
+
+  #topbar{
+    background:linear-gradient(135deg,#FF6B4A,#FF8C63);
+    color:#fff; padding:16px 20px; display:flex; align-items:center; gap:12px; flex-shrink:0;
+  }
+  #topbar .title{font-weight:700; font-size:16px;}
+  #topbar .subtitle{font-size:12px; opacity:.9; margin-top:2px;}
+  #quota-badge{
+    margin-left:auto; font-size:11px; background:rgba(255,255,255,0.2); padding:6px 10px;
+    border-radius:999px; white-space:nowrap;
+  }
+
+  /* ---------- Экран привязки Telegram ---------- */
+  #auth-gate{
+    flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding:32px 24px; text-align:center; gap:18px;
+  }
+  #auth-gate h1{font-size:20px; color:var(--brandis-dark); margin:0;}
+  #auth-gate p{font-size:14px; color:var(--brandis-brown); line-height:1.5; margin:0; max-width:380px;}
+  .tg-button{
+    display:inline-flex; align-items:center; gap:10px; background:#29A9EA; color:#fff;
+    text-decoration:none; padding:14px 26px; border-radius:14px; font-size:15px; font-weight:600;
+    box-shadow:0 8px 20px rgba(41,169,234,0.35);
+  }
+  #auth-waiting{display:none; align-items:center; gap:10px; color:var(--brandis-brown); font-size:13px;}
+  #auth-waiting.show{display:flex;}
+  .spinner{
+    width:16px; height:16px; border-radius:50%; border:2px solid rgba(138,107,82,0.25);
+    border-top-color:var(--brandis-orange); animation:spin 0.8s linear infinite;
+  }
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  /* ---------- Чат ---------- */
+  #chat-app{flex:1; display:none; flex-direction:column; min-height:0;}
+  #chat-app.show{display:flex;}
+
+  #messages{flex:1; overflow-y:auto; padding:18px; display:flex; flex-direction:column; gap:10px;}
+  .msg{max-width:85%; padding:11px 15px; border-radius:16px; font-size:14px; line-height:1.5; white-space:pre-wrap;}
+  .msg.bot{background:var(--brandis-cream); color:var(--brandis-dark); align-self:flex-start; border-bottom-left-radius:4px;}
+  .msg.user{background:var(--brandis-orange); color:#fff; align-self:flex-end; border-bottom-right-radius:4px;}
+  .msg.typing{color:var(--brandis-brown); font-style:italic; background:none;}
+  .msg.paywall{background:#fff; border:1px solid rgba(255,107,74,0.3); align-self:stretch; max-width:100%;}
+  .paywall-actions{display:flex; gap:10px; margin-top:12px; flex-wrap:wrap;}
+  .paywall-btn{
+    border:none; border-radius:12px; padding:10px 16px; font-size:13px; font-weight:600; cursor:pointer;
+  }
+  .paywall-btn.primary{background:var(--brandis-orange); color:#fff;}
+  .paywall-btn.secondary{background:var(--brandis-dark); color:#fff;}
+
+  #inputbar{display:flex; gap:8px; padding:14px; background:#fff; border-top:1px solid rgba(138,107,82,0.12); flex-shrink:0;}
+  #input{
+    flex:1; border:1px solid rgba(138,107,82,0.25); border-radius:14px; padding:12px 16px;
+    font-size:14px; outline:none; resize:none; font-family:inherit; max-height:120px;
+  }
+  #input:focus{border-color:var(--brandis-orange);}
+  #send{
+    background:var(--brandis-orange); border:none; color:#fff; border-radius:14px;
+    width:46px; height:46px; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  }
+  #send:disabled{opacity:.5; cursor:default;}
+</style>
+</head>
+<body>
+
+<div id="page">
+  <div id="topbar">
+    <div>
+      <div class="title">AI-подбор Brandis</div>
+      <div class="subtitle">Блогеры и бренды для коллабораций</div>
+    </div>
+    <div id="quota-badge" style="display:none;"></div>
+  </div>
+
+  <div id="auth-gate">
+    <h1>Войди через Telegram, чтобы начать</h1>
+    <p>Так мы сохраним историю подбора между визитами и сможем применить лимиты бесплатного доступа и подписки.</p>
+    <a id="tg-link" class="tg-button" href="#" target="_blank" rel="noopener">
+      Войти через Telegram →
+    </a>
+    <div id="auth-waiting"><span class="spinner"></span> Ждём подтверждения в Telegram…</div>
+  </div>
+
+  <div id="chat-app">
+    <div id="messages"></div>
+    <div id="inputbar">
+      <textarea id="input" rows="1" placeholder="Например: нужен фуд-блогер в Рязани до 30к подписчиков"></textarea>
+      <button id="send" aria-label="Отправить">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M3 20l18-8L3 4v6l12 2-12 2v6z" fill="white"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const API_BASE = window.BRANDIS_API_URL || "";
+
+  const authGate = document.getElementById("auth-gate");
+  const authWaiting = document.getElementById("auth-waiting");
+  const tgLink = document.getElementById("tg-link");
+  const chatApp = document.getElementById("chat-app");
+  const messagesEl = document.getElementById("messages");
+  const input = document.getElementById("input");
+  const sendBtn = document.getElementById("send");
+  const quotaBadge = document.getElementById("quota-badge");
+
+  let accessToken = localStorage.getItem("brandis_access_token") || null;
+  let pollTimer = null;
+
+  function authHeaders(extra){
+    return Object.assign({ "Content-Type": "application/json", "Authorization": "Bearer " + accessToken }, extra || {});
+  }
+
+  function forgetAuthAndReload(){
+    localStorage.removeItem("brandis_access_token");
+    localStorage.removeItem("brandis_session_code");
+    location.reload();
+  }
+
+  function addMessage(role, text){
+    const div = document.createElement("div");
+    div.className = "msg " + (role === "user" ? "user" : "bot");
+    div.textContent = text;
+    messagesEl.appendChild(div);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+    return div;
+  }
+
+  function addPaywallMessage({ message, cta }){
+    const div = document.createElement("div");
+    div.className = "msg paywall";
+    const p = document.createElement("div");
+    p.textContent = message;
+    div.appendChild(p);
+    const actions = document.createElement("div");
+    actions.className = "paywall-actions";
+
+    if (cta === "subscribe") {
+      const btn = document.createElement("button");
+      btn.className = "paywall-btn primary";
+      btn.textContent = "Оформить подписку — 999₽/мес";
+      btn.onclick = () => startPayment("/api/billing/subscribe");
+      actions.appendChild(btn);
+    }
+    if (cta === "addon") {
+      const btn = document.createElement("button");
+      btn.className = "paywall-btn primary";
+      btn.textContent = "Докупить +20 поисков — 299₽";
+      btn.onclick = () => startPayment("/api/billing/addon");
+      actions.appendChild(btn);
+    }
+    div.appendChild(actions);
+    messagesEl.appendChild(div);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  async function startPayment(endpoint){
+    try {
+      const res = await fetch(API_BASE + endpoint, {
+        method: "POST",
+        headers: authHeaders(),
+      });
+      const data = await res.json();
+      if (data.confirmation_url) {
+        window.location.href = data.confirmation_url;
+      } else {
+        addMessage("bot", "Не получилось создать платёж. Попробуй ещё раз чуть позже.");
+      }
+    } catch (e) {
+      addMessage("bot", "Не получилось создать платёж. Попробуй ещё раз чуть позже.");
+    }
+  }
+
+  function updateQuotaBadge(billing){
+    if (!billing) { quotaBadge.style.display = "none"; return; }
+    let text;
+    if (billing.subscriptionStatus === "active") {
+      const left = Math.max(billing.subscriptionIncludedSearches - billing.searchesUsedThisPeriod, 0);
+      text = left > 0 ? `Осталось ${left}/${billing.subscriptionIncludedSearches} в этом периоде` : `+${billing.addonSearchesRemaining} докуплено`;
+    } else {
+      text = billing.freeSearchUsed ? "Бесплатный поиск использован" : "1 бесплатный поиск доступен";
+    }
+    quotaBadge.textContent = text;
+    quotaBadge.style.display = "inline-block";
+  }
+
+  // ---------- Привязка Telegram ----------
+  async function startAuth(){
+    let sessionCode = localStorage.getItem("brandis_session_code");
+    if (!sessionCode) {
+      sessionCode = crypto.randomUUID();
+      localStorage.setItem("brandis_session_code", sessionCode);
+    }
+    const res = await fetch(API_BASE + "/api/auth/start", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ session_code: sessionCode }),
+    });
+    const data = await res.json();
+    if (data.bot_username) {
+      tgLink.href = `https://t.me/${data.bot_username}?start=${sessionCode}`;
+    }
+    tgLink.addEventListener("click", () => {
+      authWaiting.classList.add("show");
+      pollAuthStatus(sessionCode);
+    });
+  }
+
+  function pollAuthStatus(sessionCode){
+    if (pollTimer) clearInterval(pollTimer);
+    pollTimer = setInterval(async () => {
+      try {
+        const res = await fetch(API_BASE + `/api/auth/status?session_code=${encodeURIComponent(sessionCode)}`);
+        const data = await res.json();
+        if (data.linked && data.access_token) {
+          clearInterval(pollTimer);
+          accessToken = data.access_token;
+          localStorage.setItem("brandis_access_token", accessToken);
+          localStorage.removeItem("brandis_session_code");
+          enterChat();
+        }
+      } catch (e) { /* просто попробуем ещё раз через 2с */ }
+    }, 2000);
+  }
+
+  // ---------- Чат ----------
+  async function enterChat(){
+    authGate.style.display = "none";
+    chatApp.classList.add("show");
+
+    try {
+      const res = await fetch(API_BASE + `/api/chat/bootstrap`, { headers: authHeaders() });
+      if (res.status === 401) { forgetAuthAndReload(); return; }
+      if (!res.ok) throw new Error("bootstrap failed");
+      const data = await res.json();
+      updateQuotaBadge(data.billing);
+      if (data.history && data.history.length) {
+        data.history.forEach((m) => addMessage(m.role, m.content));
+      } else {
+        addMessage("bot", "Привет! Я помогу подобрать блогера и бренд из базы Brandis 🙂\nНапиши, кого ищешь — например: город, ниша или число подписчиков.");
+      }
+    } catch (e) {
+      addMessage("bot", "Не получилось загрузить историю, но можно писать — она сохранится дальше.");
+    }
+
+    if (new URLSearchParams(location.search).get("payment") === "return") {
+      addMessage("bot", "Проверяю статус оплаты…");
+      refreshBillingAfterPayment();
+      history.replaceState(null, "", location.pathname);
+    }
+  }
+
+  async function refreshBillingAfterPayment(attempt = 0){
+    try {
+      const res = await fetch(API_BASE + `/api/billing/status`, { headers: authHeaders() });
+      const data = await res.json();
+      updateQuotaBadge(data.billing);
+    } catch (e) {}
+    if (attempt < 5) setTimeout(() => refreshBillingAfterPayment(attempt + 1), 2500);
+  }
+
+  async function send(){
+    const text = input.value.trim();
+    if (!text) return;
+    input.value = "";
+    sendBtn.disabled = true;
+    addMessage("user", text);
+
+    const typingEl = addMessage("bot", "печатает…");
+    typingEl.classList.add("typing");
+
+    try {
+      const res = await fetch(API_BASE + "/api/v2/chat", {
+        method: "POST",
+        headers: authHeaders(),
+        body: JSON.stringify({ message: text }),
+      });
+      const data = await res.json();
+      typingEl.remove();
+
+      if (res.status === 401) { forgetAuthAndReload(); return; }
+      if (res.status === 402) {
+        addPaywallMessage(data);
+        updateQuotaBadge(data.billing);
+        return;
+      }
+      if (!res.ok) {
+        addMessage("bot", "Что-то пошло не так. Попробуй ещё раз чуть позже.");
+        return;
+      }
+
+      addMessage("bot", data.reply);
+      updateQuotaBadge(data.billing);
+    } catch (e) {
+      typingEl.remove();
+      addMessage("bot", "Не получилось связаться с сервером. Попробуй чуть позже.");
+    } finally {
+      sendBtn.disabled = false;
+    }
+  }
+
+  sendBtn.addEventListener("click", send);
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      send();
+    }
+  });
+
+  // ---------- Точка входа ----------
+  if (accessToken) {
+    enterChat();
+  } else {
+    startAuth();
+  }
+</script>
+</body>
+</html>

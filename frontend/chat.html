@@ -61,7 +61,8 @@
   #chat-app.show{display:flex;}
 
   #messages{flex:1; overflow-y:auto; padding:18px; display:flex; flex-direction:column; gap:10px;}
-  .msg{max-width:85%; padding:11px 15px; border-radius:16px; font-size:14px; line-height:1.5; white-space:pre-wrap;}
+  .msg{max-width:85%; padding:11px 15px; border-radius:16px; font-size:14px; line-height:1.5; white-space:pre-wrap; overflow-wrap:anywhere; word-break:break-word;}
+    .msg a{overflow-wrap:anywhere; word-break:break-word;}
   .msg.bot{background:var(--brandis-cream); color:var(--brandis-dark); align-self:flex-start; border-bottom-left-radius:4px;}
   .msg.user{background:var(--brandis-orange); color:#fff; align-self:flex-end; border-bottom-right-radius:4px;}
     .msg.typing{color:var(--brandis-brown); font-style:italic; background:none;}
@@ -150,6 +151,7 @@
   }
   function linkify(text){
         let escaped = escapeHtml(text);
+    escaped = escaped.replace(/\*\*([^*\n]+)\*\*/g, '<strong>$1</strong>');
     escaped = escaped.replace(/\[([^\]\n]+)\]\((https?:\/\/[^\s)]+)\)/g,
             '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
     escaped = escaped.replace(/(^|[^"'>])(https?:\/\/[^\s<]+)/g,

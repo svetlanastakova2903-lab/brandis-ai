@@ -90,6 +90,38 @@ function getCharacteristicValues(product, title) {
   .filter(Boolean);
 }
 
+// Города люди пишут руками, поэтому в каталоге живут «Санкт- Петербург», «спб» и двойные
+// пробелы — и один и тот же город распадается на несколько разных фильтров. Приводим к
+// одному написанию: убираем лишние пробелы (в том числе вокруг дефиса) и разворачиваем
+// самые частые сокращения. Ничего не выдумываем — только нормализуем то, что уже есть.
+const CITY_ALIASES = new Map([
+  ["спб", "Санкт-Петербург"],
+  ["с-пб", "Санкт-Петербург"],
+  ["питер", "Санкт-Петербург"],
+  ["saint petersburg", "Санкт-Петербург"],
+  ["saint-petersburg", "Санкт-Петербург"],
+  ["st petersburg", "Санкт-Петербург"],
+  ["spb", "Санкт-Петербург"],
+  ["мск", "Москва"],
+  ["moscow", "Москва"],
+  ["екб", "Екатеринбург"],
+  ["нижний новгород", "Нижний Новгород"],
+  ["нн", "Нижний Новгород"],
+]);
+
+function normalizeCity(raw) {
+  if (!raw) return null;
+  const cleaned = String(raw)
+    .replace(/\s+/g, " ")
+    .replace(/\s*-\s*/g, "-")
+    .trim()
+    .replace(/[.,;]+$/, "");
+  if (!cleaned) return null;
+  const alias = CITY_ALIASES.get(cleaned.toLowerCase());
+  if (alias) return alias;
+  return cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
+}
+
 function shortenNiches(rawNiches) {
   return rawNiches.map((s) => s.replace(/\s*\([^)]*\)\s*$/, "").trim()).filter(Boolean);
 }
@@ -114,7 +146,7 @@ function parseFollowers(descr) {
 }
 
 function transformBlogger(product) {
-  const cities = getCharacteristicValues(product, "Город");
+  const cities = getCharacteristicValues(product, "Город").map(normalizeCity).filter(Boolean);
   const niches = shortenNiches(getCharacteristicValues(product, "Сфера (тематика)"));
   const platforms = getCharacteristicValues(product, "Платформа");
   const photo =
@@ -148,7 +180,7 @@ return {
 }
 
 function transformBrand(product) {
-  const cities = getCharacteristicValues(product, "Город");
+  const cities = getCharacteristicValues(product, "Город").map(normalizeCity).filter(Boolean);
   const niches = shortenNiches(getCharacteristicValues(product, "Сфера (тематика)"));
   const contact = normalizeUrl(product.buttonlink || product.url);
 
@@ -165,6 +197,19 @@ return {
   // есть ссылка (сайт/соцсеть) — используем её, это не хуже как способ связаться.
   contact,
 };
+}
+
+// Экспортируем сборку каталога отдельно от записи файлов: сервер зовёт её на старте и
+// по таймеру, чтобы держать базу в памяти свежей, не дожидаясь коммита новых JSON.
+export async function fetchCatalog() {
+  const [{ products: bloggerProducts, total: bloggersTotal }, { products: brandProducts, total: brandsTotal }] =
+    await Promise.all([fetchAllProducts("Блогеры"), fetchAllProducts("Бренды")]);
+  return {
+    bloggers: bloggerProducts.map(transformBlogger).filter(Boolean),
+    brands: brandProducts.map(transformBrand).filter(Boolean),
+    bloggersTotal,
+    brandsTotal,
+  };
 }
 
 async function main() {
@@ -200,7 +245,12 @@ if (bloggers.length < bloggersTotal * 0.5) {
 }
 }
 
-main().catch((err) => {
-  console.error("Ошибка обновления каталога:", err);
-  process.exit(1);
-});
+// Файл теперь ещё и модуль (сервер импортирует fetchCatalog), поэтому main() запускаем
+// только когда скрипт вызвали напрямую: node refreshCatalog.js
+const invokedDirectly = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
+if (invokedDirectly) {
+  main().catch((err) => {
+    console.error("Ошибка обновления каталога:", err);
+    process.exit(1);
+  });
+}

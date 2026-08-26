@@ -71,6 +71,41 @@ let BLOGGERS = loadJson("bloggers.json", "bloggers.test.json");
 let BRANDS = loadJson("brands.json", "brands.test.json");
 console.log(`Загружено (${DATA_MODE}): блогеров ${BLOGGERS.length}, брендов ${BRANDS.length}`);
 
+// JSON в репозитории — это только стартовый снимок: на Render диск эфемерный, поэтому
+// раньше каталог обновлялся файлами и устаревал между коммитами. Теперь сервер сам
+// подтягивает живой каталог с brandisapp.ru при старте и раз в несколько часов.
+// Подменяем базу только если ответ выглядит здоровым — иначе продолжаем на снимке.
+const CATALOG_REFRESH_MINUTES = Number(process.env.CATALOG_REFRESH_MINUTES || 360);
+
+async function refreshCatalogInMemory(reason) {
+    try {
+        const { fetchCatalog } = await import("./refreshCatalog.js");
+        const { bloggers, brands } = await fetchCatalog();
+        const sane =
+            bloggers.length > 0 &&
+            brands.length > 0 &&
+            bloggers.length >= BLOGGERS.length * 0.8 &&
+            brands.length >= BRANDS.length * 0.8;
+        if (!sane) {
+            console.warn(
+                `[catalog] ${reason}: ответ выглядит подозрительно (блогеров ${bloggers.length}, брендов ${brands.length} ` +
+                `против ${BLOGGERS.length}/${BRANDS.length}) — оставляю прежнюю базу`
+            );
+            return;
+        }
+        BLOGGERS = bloggers;
+        BRANDS = brands;
+        console.log(`[catalog] ${reason}: обновлено — блогеров ${BLOGGERS.length}, брендов ${BRANDS.length}`);
+    } catch (err) {
+        console.warn(`[catalog] ${reason}: не удалось обновить (${err.message}) — работаю на прежней базе`);
+    }
+}
+
+if (DATA_MODE === "real") {
+    refreshCatalogInMemory("старт");
+    setInterval(() => refreshCatalogInMemory("по расписанию"), CATALOG_REFRESH_MINUTES * 60 * 1000).unref();
+}
+
 // ---------- Логирование диалогов (старый плоский лог, для обратной совместимости с /api/chat v1) ----------
 const LOG_FILE = path.join(__dirname, "logs.jsonl");
 function logInteraction(entry) {

@@ -24,6 +24,30 @@ const PORT = process.env.PORT || 3000;
 const DATA_MODE = process.env.DATA_MODE || "test"; // "test" | "real"
 const PREFILTER_THRESHOLD = 200;
 const MAX_CANDIDATES_TO_MODEL = 40;
+
+// Модель и уровень усилий вынесены в переменные окружения: так можно откатиться или попробовать
+// другой уровень прямо из панели Render, без правки кода и передеплоя из гита.
+const CHAT_MODEL = process.env.CHAT_MODEL || "claude-sonnet-5";
+const CHAT_EFFORT = process.env.CHAT_EFFORT || "medium";
+const CHAT_MAX_TOKENS = Number(process.env.CHAT_MAX_TOKENS) || 2000;
+
+// В карточках, которые уходят в модель, есть поля, которые она никогда не использует в ответе:
+// ссылка на фото (это ~100 символов случайного адреса на карточку) и profile_url, который почти
+// всегда дублирует contact. Плюс пустые поля. Всё это — чистый вес промпта на каждом сообщении.
+function slimForModel(items) {
+    return items.map((it) => {
+          const out = {};
+          for (const key of Object.keys(it)) {
+                  const value = it[key];
+                  if (key === "photo") continue;
+                  if (key === "profile_url" && value === it.contact) continue;
+                  if (value === null || value === undefined || value === "") continue;
+                  if (Array.isArray(value) && value.length === 0) continue;
+                  out[key] = value;
+          }
+          return out;
+    });
+}
 // Публичный адрес этого сервиса — нужен для return_url платежей ЮKassa.
 // На Render это https://brandis-ai.onrender.com (или свой домен, если подключишь).
 const PUBLIC_BASE_URL = process.env.PUBLIC_BASE_URL || "http://localhost:" + PORT;
@@ -173,15 +197,26 @@ function buildBaseSystemPrompt(bloggerCandidates, brandCandidates) {
              ОТОБРАННЫЕ КАНДИДАТЫ ПОД ТЕКУЩИЙ ЗАПРОС (подмножество базы, НЕ вся база — см. общую статистику выше):
 
              БАЗА БЛОГГЕРОВ (JSON, для сценариев 1 и 3):
-             ${JSON.stringify(bloggerCandidates, null, 0)}
+             ${JSON.stringify(slimForModel(bloggerCandidates), null, 0)}
 
              БАЗА БРЕНДОВ (JSON, для сценария 2):
-             ${JSON.stringify(brandCandidates, null, 0)}`;
+             ${JSON.stringify(slimForModel(brandCandidates), null, 0)}`;
 }
 
 // v2 добавляет: краткое саммари предыдущей истории (если есть) + обязательный вызов инструмента
 // deliver_recommendations при выдаче итоговой подборки — это единственный надёжный сигнал
 // "поиск завершён" для биллинга (считаем по нему, а не по количеству сообщений).
+// Пишем реальный расход токенов в логи: без этого себестоимость подбора приходится оценивать
+// на глаз, а по логам её видно точно.
+function logUsage(tag, response, extra = {}) {
+    const u = response?.usage || {};
+    console.log(
+          `[usage] ${tag} model=${CHAT_MODEL} effort=${CHAT_EFFORT} in=${u.input_tokens} out=${u.output_tokens}` +
+          (extra.systemChars ? ` sysChars=${extra.systemChars}` : "") +
+          (extra.turnsSinceSearch !== undefined ? ` turn=${extra.turnsSinceSearch}` : "")
+    );
+}
+
 function buildSystemPromptV2(bloggerCandidates, brandCandidates, summary, turnsSinceSearch = 0) {
     const base = buildBaseSystemPrompt(bloggerCandidates, brandCandidates);
     const summaryBlock = summary
@@ -239,11 +274,13 @@ app.post("/api/chat", async (req, res) => {
             .map((m) => ({ role: m.role, content: m.content }));
 
       const response = await anthropic.messages.create({
-              model: "claude-sonnet-4-6",
-              max_tokens: 800,
+              model: CHAT_MODEL,
+              max_tokens: CHAT_MAX_TOKENS,
+              output_config: { effort: CHAT_EFFORT },
               system,
               messages: claudeMessages,
       });
+      logUsage("v1", response);
 
       const replyText = response.content
             .filter((b) => b.type === "text")
@@ -419,12 +456,14 @@ app.post("/api/v2/chat", requireAuth, async (req, res) => {
       const claudeMessages = [...recentMessages, { role: "user", content: message }];
 
       const response = await anthropic.messages.create({
-              model: "claude-sonnet-4-6",
-              max_tokens: 800,
+              model: CHAT_MODEL,
+              max_tokens: CHAT_MAX_TOKENS,
+              output_config: { effort: CHAT_EFFORT },
               system,
               messages: claudeMessages,
               tools: [DELIVER_RECOMMENDATIONS_TOOL],
       });
+      logUsage("v2", response, { systemChars: system.length, turnsSinceSearch });
 
       const replyText = response.content
             .filter((b) => b.type === "text")
@@ -442,7 +481,7 @@ app.post("/api/v2/chat", requireAuth, async (req, res) => {
               await billing.recordSearchCompleted(telegramId, {
                         billedAs: access.billedAs,
                         intent: toolUse?.input?.intent,
-                        model: "claude-sonnet-4-6",
+                        model: CHAT_MODEL,
                         inputTokens: response.usage?.input_tokens,
                         outputTokens: response.usage?.output_tokens,
               });

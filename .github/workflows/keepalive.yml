@@ -1,0 +1,16 @@
+name: keepalive
+
+# Держим бесплатный инстанс Render разбуженным в те часы, когда сайтом реально пользуются.
+# 03:00-21:59 UTC = 06:00-00:59 МСК. Ночью сервис засыпает, поэтому за месяц выходит
+# около 590 часов из 750 бесплатных, которые Render даёт воркспейсу.
+on:
+  schedule:
+    - cron: "*/5 3-21 * * *"
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Render health
+        run: curl -sSf --max-time 120 --retry 3 --retry-delay 15 --retry-all-errors https://brandis-ai.onrender.com/api/health

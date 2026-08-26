@@ -29,7 +29,9 @@ async function fetchCategoryPage(categoryLabel, page) {
     getparts: "false",
     getoptions: "false",
     size: String(PAGE_SIZE),
-    p: String(page),
+    // Постранично API листает параметром slice, а не p: с "p" он молча отдаёт первую
+    // страницу снова и снова, и обход обрывался на первой сотне карточек.
+    slice: String(page),
     flag_root: "withroot",
   });
   params.append("filters[storepartuid][0]", categoryLabel);
@@ -136,10 +138,9 @@ return {
   niche: niches,
   followers: parseFollowers(product.descr),
   platform: platforms[0] || null,
-  price_from: null,
-  engagement: null,
-  looking_for: ["paid_collab"],
-  barter_interest: null,
+  // Условия сотрудничества (деньги / бартер / кросс-промо), цену и вовлечённость мы у людей
+  // не спрашиваем — в каталоге таких полей нет. Раньше здесь стояли выдуманные значения,
+  // и модель на них ссылалась как на факт. Лучше не знать, чем знать неправду.
   contact,
   profile_url: contact,
   photo,
@@ -159,13 +160,10 @@ return {
   name,
   city,
   niche: niches,
-  offer_type: "деньги", // как и раньше — в каталоге это поле не заведено, дефолт "деньги"
-  budget_from: null,
   // Раньше контактом был телефон, распарсенный из полного CSV-экспорта (поле Text).
   // Открытый API Тильды такого текста не отдаёт, зато у карточки бренда почти всегда
   // есть ссылка (сайт/соцсеть) — используем её, это не хуже как способ связаться.
   contact,
-  description: null,
 };
 }
 

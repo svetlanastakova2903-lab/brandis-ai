@@ -455,7 +455,7 @@ app.post("/api/v2/chat", requireAuth, async (req, res) => {
 // ---------- Оплата: ЮKassa ----------
 app.post("/api/billing/subscribe", requireAuth, async (req, res) => {
     try {
-          const returnUrl = `${PUBLIC_BASE_URL}/chat.html?payment=return`;
+          const returnUrl = (process.env.SITE_BASE_URL || PUBLIC_BASE_URL) + "/ai?payment=return";
           const confirmationUrl = await billing.startSubscription(req.telegramId, returnUrl);
           res.json({ confirmation_url: confirmationUrl });
     } catch (err) {
@@ -466,7 +466,7 @@ app.post("/api/billing/subscribe", requireAuth, async (req, res) => {
 
 app.post("/api/billing/addon", requireAuth, async (req, res) => {
     try {
-          const returnUrl = `${PUBLIC_BASE_URL}/chat.html?payment=return`;
+          const returnUrl = (process.env.SITE_BASE_URL || PUBLIC_BASE_URL) + "/ai?payment=return";
           const confirmationUrl = await billing.startAddonPurchase(req.telegramId, returnUrl);
           res.json({ confirmation_url: confirmationUrl });
     } catch (err) {

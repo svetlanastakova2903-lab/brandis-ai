@@ -273,14 +273,19 @@ app.post("/api/chat", async (req, res) => {
             .filter((m) => m.role === "user" || m.role === "assistant")
             .map((m) => ({ role: m.role, content: m.content }));
 
+      // Инструмент передаём и здесь: биллинга в v1 нет, но по полю searchCompleted в ответе
+      // можно проверить на живой модели, что она вызывает deliver_recommendations — не тратя
+      // при этом подбор реального пользователя.
       const response = await anthropic.messages.create({
               model: CHAT_MODEL,
               max_tokens: CHAT_MAX_TOKENS,
               output_config: { effort: CHAT_EFFORT },
               system,
               messages: claudeMessages,
+              tools: [DELIVER_RECOMMENDATIONS_TOOL],
       });
       logUsage("v1", response);
+      const v1ToolUse = response.content.find((b) => b.type === "tool_use" && b.name === "deliver_recommendations");
 
       const replyText = response.content
             .filter((b) => b.type === "text")
@@ -294,7 +299,7 @@ app.post("/api/chat", async (req, res) => {
               reply: replyText,
       });
 
-      res.json({ reply: replyText });
+      res.json({ reply: replyText, searchCompleted: !!v1ToolUse, intent: v1ToolUse?.input?.intent });
     } catch (err) {
           console.error("Ошибка /api/chat:", err);
           res.status(500).json({ error: "Что-то пошло не так. Попробуй ещё раз чуть позже." });
@@ -526,9 +531,14 @@ app.get("/api/billing/packs", (req, res) => {
     res.json({ packs: billing.PACKS });
 });
 
+// Куда вернуть человека после оплаты. Путь берём из белого списка, а не из тела запроса,
+// чтобы не превратить это в открытый редирект.
+const RETURN_PATHS = { ai: "/ai?payment=return", me: "/me?payment=return" };
+
 app.post("/api/billing/pack", requireAuth, async (req, res) => {
     try {
-          const returnUrl = (process.env.SITE_BASE_URL || PUBLIC_BASE_URL) + "/ai?payment=return";
+          const path = RETURN_PATHS[req.body?.from] || RETURN_PATHS.ai;
+          const returnUrl = (process.env.SITE_BASE_URL || PUBLIC_BASE_URL) + path;
           const confirmationUrl = await billing.startPackPurchase(req.telegramId, req.body?.pack, returnUrl);
           res.json({ confirmation_url: confirmationUrl });
     } catch (err) {

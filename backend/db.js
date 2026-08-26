@@ -113,6 +113,20 @@ export async function initSchema() {
   `);
 
   await query(`
+    CREATE TABLE IF NOT EXISTS favorites (
+      id            BIGSERIAL PRIMARY KEY,
+      telegram_id   BIGINT NOT NULL REFERENCES users(telegram_id),
+      product_uid   TEXT NOT NULL,
+      title         TEXT NOT NULL,
+      url           TEXT,
+      photo         TEXT,
+      category      TEXT,
+      created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+    );
+  `);
+  await query(`CREATE UNIQUE INDEX IF NOT EXISTS idx_favorites_user_product ON favorites(telegram_id, product_uid);`);
+
+  await query(`
     CREATE TABLE IF NOT EXISTS payments (
       id                     BIGSERIAL PRIMARY KEY,
       telegram_id            BIGINT NOT NULL REFERENCES users(telegram_id),
@@ -280,6 +294,37 @@ export async function updatePaymentStatus(yookassaPaymentId, status, rawPayload)
 }
 
 // ---------- рассылки / due renewals ----------
+// ---------- избранное ----------
+export async function listFavorites(telegramId) {
+  const { rows } = await query(
+    `SELECT product_uid, title, url, photo, category, created_at
+       FROM favorites WHERE telegram_id = $1 ORDER BY created_at DESC`,
+    [telegramId]
+  );
+  return rows;
+}
+
+export async function addFavorite(telegramId, { productUid, title, url, photo, category }) {
+  // Повторное добавление той же карточки не должно падать — просто обновляем то, что могло измениться.
+  const { rows } = await query(
+    `INSERT INTO favorites (telegram_id, product_uid, title, url, photo, category)
+          VALUES ($1, $2, $3, $4, $5, $6)
+     ON CONFLICT (telegram_id, product_uid)
+     DO UPDATE SET title = EXCLUDED.title, url = EXCLUDED.url, photo = EXCLUDED.photo, category = EXCLUDED.category
+     RETURNING product_uid, title, url, photo, category, created_at`,
+    [telegramId, productUid, title, url || null, photo || null, category || null]
+  );
+  return rows[0];
+}
+
+export async function removeFavorite(telegramId, productUid) {
+  const { rowCount } = await query(
+    `DELETE FROM favorites WHERE telegram_id = $1 AND product_uid = $2`,
+    [telegramId, productUid]
+  );
+  return rowCount > 0;
+}
+
 export async function listDueRenewals(now = new Date()) {
   const { rows } = await query(
     `SELECT * FROM users

@@ -526,6 +526,55 @@ app.post("/api/billing/subscribe", requireAuth, async (req, res) => {
     }
 });
 
+// ---------- Избранное ----------
+// Своя замена корзине Tilda Store: она была привязана к тильдовской регистрации, а вход у нас
+// через Telegram. Здесь карточка каталога сохраняется за конкретным telegram_id.
+const FAV_LIMIT = 500;
+
+app.get("/api/favorites", requireAuth, async (req, res) => {
+    try {
+          res.json({ favorites: await db.listFavorites(req.telegramId) });
+    } catch (err) {
+          console.error("Ошибка GET /api/favorites:", err);
+          res.status(500).json({ error: "Не удалось получить избранное." });
+    }
+});
+
+app.post("/api/favorites", requireAuth, async (req, res) => {
+    try {
+          const productUid = String(req.body?.uid || "").trim();
+          const title = String(req.body?.title || "").trim();
+          if (!productUid || !title) return res.status(400).json({ error: "uid и title обязательны" });
+
+      const current = await db.listFavorites(req.telegramId);
+          if (current.length >= FAV_LIMIT && !current.some((f) => f.product_uid === productUid)) {
+                  return res.status(400).json({ error: `В избранном уже ${FAV_LIMIT} карточек — больше не помещается.` });
+          }
+
+      const favorite = await db.addFavorite(req.telegramId, {
+              productUid,
+              title: title.slice(0, 300),
+              url: String(req.body?.url || "").slice(0, 500),
+              photo: String(req.body?.photo || "").slice(0, 500),
+              category: String(req.body?.category || "").slice(0, 100),
+      });
+          res.json({ favorite });
+    } catch (err) {
+          console.error("Ошибка POST /api/favorites:", err);
+          res.status(500).json({ error: "Не удалось добавить в избранное." });
+    }
+});
+
+app.delete("/api/favorites/:uid", requireAuth, async (req, res) => {
+    try {
+          const removed = await db.removeFavorite(req.telegramId, String(req.params.uid || ""));
+          res.json({ removed });
+    } catch (err) {
+          console.error("Ошибка DELETE /api/favorites:", err);
+          res.status(500).json({ error: "Не удалось убрать из избранного." });
+    }
+});
+
 // Каталог пакетов — чтобы цена жила только в бэкенде, а фронтенд её просто показывал.
 app.get("/api/billing/packs", (req, res) => {
     res.json({ packs: billing.PACKS });

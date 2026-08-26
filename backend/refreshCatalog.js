@@ -145,6 +145,12 @@ function parseFollowers(descr) {
   return Math.round(num);
 }
 
+// Контакт живёт в характеристике "Контакт". Раньше он лежал в поле "Ссылка" карточки, но
+// в Тильде это поле — "ссылка на страницу с описанием товара": пока оно заполнено, у карточки
+// нет своей страницы и в sitemap уходит чужой домен. Перенесли контакты в характеристику,
+// поле освободили — теперь у каждой карточки есть свой индексируемый адрес.
+// product.url больше НЕ годится как контакт: там теперь наш же tproduct-адрес.
+
 function transformBlogger(product) {
   const cities = getCharacteristicValues(product, "Город").map(normalizeCity).filter(Boolean);
   const niches = shortenNiches(getCharacteristicValues(product, "Сфера (тематика)"));
@@ -158,7 +164,7 @@ function transformBlogger(product) {
         return null;
       }
     })() || product.editions?.[0]?.img || null;
-  const contact = normalizeUrl(product.buttonlink || product.url);
+  const contact = normalizeUrl(getCharacteristicValues(product, "Контакт")[0] || product.buttonlink);
 
 const name = (product.title || "").trim();
   const city = cities.join(";");
@@ -185,7 +191,7 @@ return {
 function transformBrand(product) {
   const cities = getCharacteristicValues(product, "Город").map(normalizeCity).filter(Boolean);
   const niches = shortenNiches(getCharacteristicValues(product, "Сфера (тематика)"));
-  const contact = normalizeUrl(product.buttonlink || product.url);
+  const contact = normalizeUrl(getCharacteristicValues(product, "Контакт")[0] || product.buttonlink);
 
 const name = (product.title || "").trim();
   const city = cities.join(";");

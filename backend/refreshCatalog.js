@@ -162,11 +162,14 @@ function transformBlogger(product) {
 
 const name = (product.title || "").trim();
   const city = cities.join(";");
-  if (!name || !city) return null; // как и в старом importCsv.js — без города карточку не берём
+  // Раньше карточку без города выбрасывали (наследие CSV-импорта) — и 65 живых блогеров
+  // просто не существовали для ИИ. Город — полезный фильтр, но не повод удалять человека
+  // из базы: оставляем с city = null, а модель предупреждена, что город неизвестен.
+  if (!name) return null;
 
 return {
   name,
-  city,
+  city: city || null,
   niche: niches,
   followers: parseFollowers(product.descr),
   platform: platforms[0] || null,
@@ -186,11 +189,11 @@ function transformBrand(product) {
 
 const name = (product.title || "").trim();
   const city = cities.join(";");
-  if (!name || !city) return null;
+  if (!name) return null;
 
 return {
   name,
-  city,
+  city: city || null,
   niche: niches,
   // Раньше контактом был телефон, распарсенный из полного CSV-экспорта (поле Text).
   // Открытый API Тильды такого текста не отдаёт, зато у карточки бренда почти всегда

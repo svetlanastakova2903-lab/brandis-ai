@@ -1,0 +1,592 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AI-чат Brandis</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Archivo:wght@700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --orange:#FF6A2C;
+    --orange-light:#FF8A52;
+    --bg:#0c0b09;
+    --cream:#f2ede4;
+    --muted:#948d82;
+    --dim:#5f5a52;
+    --line:rgba(255,255,255,0.12);
+    --card:rgba(16,14,12,0.78);
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;margin:0;}
+  body{
+    font-family:"JetBrains Mono",monospace;
+    background:var(--bg); color:var(--cream);
+    overflow:hidden;
+  }
+  a{color:var(--orange);}
+  a:hover{color:var(--orange-light);}
+  ::selection{background:var(--orange);color:var(--bg);}
+  textarea{font-family:inherit;}
+  ::-webkit-scrollbar{width:8px;height:8px;}
+  ::-webkit-scrollbar-track{background:var(--bg);}
+  ::-webkit-scrollbar-thumb{background:rgba(255,106,44,.35);}
+  ::-webkit-scrollbar-thumb:hover{background:rgba(255,106,44,.6);}
+
+  @keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
+  @keyframes riseIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  @keyframes dotPulse{0%,80%,100%{opacity:.25;transform:translateY(0)}40%{opacity:1;transform:translateY(-3px)}}
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  #space{position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:0;}
+  #glow{position:fixed;inset:0;z-index:1;pointer-events:none;background:radial-gradient(120% 90% at 50% 0%,rgba(255,106,44,0.10),transparent 55%),radial-gradient(80% 70% at 85% 100%,rgba(255,106,44,0.06),transparent 60%);}
+
+  #app{position:relative;z-index:2;height:100dvh;width:100%;display:flex;flex-direction:column;}
+
+  /* ---------- Шапка сайта ---------- */
+  #sitehead{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px clamp(16px,4vw,40px);border-bottom:1px solid var(--line);flex-shrink:0;background:rgba(12,11,9,0.92);backdrop-filter:blur(10px);}
+  #sitehead .logo{display:flex;flex-direction:column;gap:2px;text-decoration:none;color:var(--cream);}
+  #sitehead .logo .name{font-family:Archivo,sans-serif;font-weight:900;font-size:20px;letter-spacing:0.5px;}
+  #sitehead .logo .name span{color:var(--orange);}
+  #sitehead .logo .sub{font-size:10px;color:var(--muted);letter-spacing:0.5px;}
+  #sitenav{display:flex;gap:clamp(14px,3vw,32px);align-items:center;}
+  #sitenav a{font-size:11.5px;letter-spacing:1.5px;color:var(--cream);text-decoration:none;}
+  #sitenav a:hover{color:var(--orange-light);}
+  #sitenav .current{display:flex;align-items:center;gap:7px;font-size:11.5px;letter-spacing:1.5px;color:var(--orange);}
+  #sitenav .current .dot{width:5px;height:5px;border-radius:999px;background:var(--orange);animation:blink 1.6s infinite;}
+  #headright{display:flex;align-items:center;gap:10px;}
+  #login-btn{padding:9px 18px;border:1px solid rgba(255,255,255,0.3);font-size:10.5px;letter-spacing:1.3px;color:var(--cream);cursor:pointer;text-decoration:none;white-space:nowrap;}
+  #login-btn:hover{border-color:var(--orange);color:var(--orange-light);}
+  #burger{display:none;flex-direction:column;gap:5px;padding:10px;border:1px solid rgba(255,255,255,0.25);cursor:pointer;background:none;}
+  #burger span{width:16px;height:1px;background:var(--cream);display:block;}
+  #mobilemenu{display:none;flex-direction:column;border-bottom:1px solid var(--line);background:var(--bg);flex-shrink:0;}
+  #mobilemenu a,#mobilemenu .current{padding:15px clamp(16px,4vw,40px);font-size:12px;letter-spacing:1.5px;color:var(--cream);text-decoration:none;border-bottom:1px solid rgba(255,255,255,0.07);}
+  #mobilemenu .current{color:var(--orange);}
+
+  @media (max-width:860px){
+    #sitenav{display:none;}
+    #burger{display:flex;}
+  }
+
+  /* ---------- Тело чата ---------- */
+  #body{flex:1;display:grid;grid-template-columns:minmax(0,1fr) clamp(250px,24vw,330px);min-height:0;}
+  @media (max-width:940px){ #body{grid-template-columns:minmax(0,1fr);} }
+
+  #chatcol{display:flex;flex-direction:column;min-height:0;position:relative;}
+
+  /* ---------- Экран входа ---------- */
+  #authgate{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;text-align:center;gap:18px;}
+  #authgate h1{font-family:Archivo,sans-serif;font-weight:900;font-size:clamp(20px,3vw,28px);color:var(--cream);margin:0;text-transform:uppercase;line-height:1.25;}
+  #authgate p{font-size:13px;color:var(--muted);line-height:1.7;margin:0;max-width:400px;}
+  .tg-btn{display:inline-flex;align-items:center;gap:10px;background:var(--orange);color:var(--bg);text-decoration:none;padding:14px 26px;font-weight:700;font-size:13px;letter-spacing:0.5px;box-shadow:0 8px 24px rgba(255,106,44,0.35);}
+  .tg-btn:hover{background:var(--orange-light);color:var(--bg);}
+  #authwait{display:none;align-items:center;gap:10px;color:var(--muted);font-size:12px;}
+  #authwait.show{display:flex;}
+  .spinner{width:15px;height:15px;border-radius:50%;border:2px solid rgba(255,255,255,0.2);border-top-color:var(--orange);animation:spin 0.8s linear infinite;}
+  #authnote{font-size:10.5px;color:var(--dim);max-width:380px;line-height:1.7;}
+
+  /* ---------- Чат-приложение ---------- */
+  #chatapp{flex:1;display:none;flex-direction:column;min-height:0;}
+  #chatapp.show{display:flex;}
+  #scrollarea{flex:1;min-height:0;overflow-y:auto;padding:clamp(20px,3vw,36px) clamp(18px,4vw,44px);}
+  #thread{max-width:820px;margin:0 auto;display:flex;flex-direction:column;gap:22px;}
+
+  #empty{padding-top:clamp(8px,4vh,36px);}
+  #empty .tag{font-size:11px;letter-spacing:2px;color:var(--orange);margin-bottom:14px;}
+  #empty h2{font-family:Archivo,sans-serif;font-weight:900;font-size:clamp(22px,3.4vw,32px);line-height:1.2;margin:0 0 14px;text-transform:uppercase;}
+  #empty p{font-size:13px;color:var(--muted);line-height:1.75;max-width:540px;margin:0 0 26px;}
+  #empty .label{font-size:10px;letter-spacing:1.6px;color:var(--dim);margin-bottom:12px;}
+  #presets{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:9px;}
+  .preset{padding:14px;border:1px solid var(--line);background:var(--card);backdrop-filter:blur(8px);cursor:pointer;display:flex;gap:11px;align-items:flex-start;}
+  .preset:hover{border-color:var(--orange);background:#151210;}
+  .preset .tag{color:var(--orange);font-size:11px;flex-shrink:0;}
+  .preset .txt{font-size:12px;color:#c9c2b6;line-height:1.55;}
+
+  .row{display:flex;flex-direction:column;gap:9px;animation:riseIn 0.35s ease both;}
+  .row.user{align-items:flex-end;}
+  .row.bot{align-items:flex-start;}
+  .rowlabel{font-size:9.5px;letter-spacing:1.6px;}
+  .row.user .rowlabel{color:var(--dim);}
+  .row.bot .rowlabel{color:var(--orange);}
+  .bubble{padding:14px 17px;font-size:13px;line-height:1.75;white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word;}
+  .bubble a{overflow-wrap:anywhere;word-break:break-word;}
+  .row.user .bubble{max-width:82%;border:1px solid rgba(255,106,44,0.4);background:rgba(255,106,44,0.08);color:var(--cream);}
+  .row.bot .bubble{max-width:100%;border:1px solid var(--line);background:var(--card);backdrop-filter:blur(8px);color:#c9c2b6;}
+
+  .typing-dots{display:flex;gap:6px;align-items:center;padding:14px 17px;border:1px solid var(--line);background:var(--card);backdrop-filter:blur(8px);width:fit-content;}
+  .typing-dots span{width:6px;height:6px;border-radius:999px;background:var(--orange);animation:dotPulse 1.2s infinite;}
+  .typing-dots span:nth-child(2){animation-delay:.15s;}
+  .typing-dots span:nth-child(3){animation-delay:.3s;}
+
+  .paywall{width:100%;border:1px solid rgba(255,106,44,0.4);background:rgba(255,106,44,0.06);padding:18px;display:flex;flex-direction:column;gap:14px;}
+  .paywall .msg{font-size:13px;color:#c9c2b6;line-height:1.7;}
+  .paywall-actions{display:flex;gap:10px;flex-wrap:wrap;}
+  .paywall-btn{border:none;padding:11px 18px;font-size:11.5px;letter-spacing:0.6px;font-weight:700;cursor:pointer;font-family:inherit;}
+  .paywall-btn.primary{background:var(--orange);color:var(--bg);}
+  .paywall-btn.primary:hover{background:var(--orange-light);}
+  .paywall-btn.secondary{background:transparent;border:1px solid rgba(255,255,255,0.25);color:var(--cream);}
+  .paywall-btn.secondary:hover{border-color:var(--orange);color:var(--orange-light);}
+
+  /* ---------- Инпут ---------- */
+  #inputwrap{border-top:1px solid var(--line);padding:15px clamp(18px,4vw,44px) 17px;background:rgba(12,11,9,0.85);backdrop-filter:blur(10px);flex-shrink:0;}
+  #inputinner{max-width:820px;margin:0 auto;}
+  #inputbox{display:flex;gap:10px;align-items:flex-end;border:1px solid rgba(255,255,255,0.2);background:var(--card);backdrop-filter:blur(8px);padding:11px 11px 11px 15px;}
+  #inputbox:focus-within{border-color:var(--orange);}
+  #input{flex:1;background:transparent;border:0;outline:none;color:var(--cream);font-size:13px;line-height:1.6;resize:none;max-height:130px;font-family:inherit;}
+  #input::placeholder{color:var(--dim);}
+  #send{width:38px;height:38px;background:var(--orange);color:var(--bg);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;font-size:15px;}
+  #send:hover{background:var(--orange-light);}
+  #send:disabled{opacity:.5;cursor:default;}
+  #inputfoot{display:flex;justify-content:space-between;gap:12px;margin-top:9px;font-size:9.5px;color:var(--dim);letter-spacing:0.6px;flex-wrap:wrap;}
+
+  /* ---------- Сайдбар "что умею" ---------- */
+  #guide{display:flex;flex-direction:column;min-height:0;border-left:1px solid var(--line);background:rgba(10,9,8,0.72);backdrop-filter:blur(10px);}
+  #guide .ghead{padding:16px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:10px;letter-spacing:1.6px;color:var(--dim);}
+  #guidebody{flex:1;min-height:0;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:8px;}
+  .skill{border:1px solid var(--line);background:var(--card);backdrop-filter:blur(8px);padding:14px;cursor:pointer;display:flex;flex-direction:column;gap:6px;}
+  .skill:hover{border-color:var(--orange);background:#151210;}
+  .skill .head{display:flex;gap:9px;align-items:baseline;}
+  .skill .num{font-size:10px;color:var(--orange);flex-shrink:0;}
+  .skill .title{font-size:12px;color:var(--cream);font-weight:700;font-family:Archivo,sans-serif;line-height:1.35;}
+  .skill .hint{font-size:10.5px;color:var(--muted);line-height:1.6;}
+  #guidefoot{padding:15px 18px;border-top:1px solid var(--line);font-size:10px;color:var(--dim);line-height:1.7;}
+  @media (max-width:940px){
+    #guide{display:none;position:fixed;inset:66px 0 0;z-index:60;background:#0a0908;}
+    #guide.open{display:flex;}
+    #guideclose{display:block !important;}
+  }
+  #guideclose{display:none;font-size:12px;color:var(--muted);cursor:pointer;}
+  #guidetoggle{display:none;align-items:center;padding:8px 14px;border:1px solid rgba(255,255,255,0.25);font-size:10px;letter-spacing:1.2px;color:#c9c2b6;cursor:pointer;background:none;font-family:inherit;margin:10px clamp(18px,4vw,44px) 0 auto;}
+  @media (max-width:940px){
+    #guidetoggle{display:flex;}
+  }
+</style>
+
+</head>
+<body>
+
+<canvas id="space"></canvas>
+<div id="glow"></div>
+
+<div id="app">
+
+  <div id="sitehead">
+    <a href="/" class="logo">
+      <div class="name">BRAND<span>IS</span>_</div>
+      <div class="sub">ai-помощник по коллаборациям_</div>
+    </a>
+    <div id="sitenav">
+      <a href="/catalog">БЛОГЕРЫ</a>
+      <a href="/catalog?tab=brands">БРЕНДЫ</a>
+      <a href="/blog">НОВОСТИ</a>
+      <div class="current"><span class="dot"></span>AI-ЧАТ</div>
+    </div>
+    <div id="headright">
+      <a id="login-btn" href="#openmembersbar">ВОЙТИ</a>
+      <button id="burger" aria-label="Меню"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+
+  <div id="mobilemenu">
+    <a href="/catalog">БЛОГЕРЫ</a>
+    <a href="/catalog?tab=brands">БРЕНДЫ</a>
+    <a href="/blog">НОВОСТИ</a>
+    <div class="current">AI-ЧАТ</div>
+  </div>
+
+  <button id="guidetoggle">ЧТО УМЕЕТ ИИ</button>
+
+  <div id="body">
+    <div id="chatcol">
+
+      <div id="authgate">
+        <h1>Войди через Telegram,<br>чтобы начать подбор</h1>
+        <p>Так мы сохраним историю между визитами и сможем дать тебе 1 бесплатный подбор, а дальше — по подписке.</p>
+        <a id="tg-link" class="tg-btn" href="#" target="_blank" rel="noopener">Войти через Telegram →</a>
+        <div id="authwait"><span class="spinner"></span> Ждём подтверждения в Telegram…</div>
+        <div id="authnote">Первый подбор — бесплатно. Дальше — подписка 999₽/мес на 50 подборов или разовый пакет +20 за 299₽.</div>
+      </div>
+
+      <div id="chatapp">
+        <div id="scrollarea"><div id="thread"></div></div>
+
+        <div id="inputwrap">
+          <div id="inputinner">
+            <div id="inputbox">
+              <textarea id="input" rows="1" placeholder="Например: нужен фуд-блогер в Рязани до 30к подписчиков"></textarea>
+              <button id="send" aria-label="Отправить">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M3 20l18-8L3 4v6l12 2-12 2v6z" fill="currentColor"/></svg>
+              </button>
+            </div>
+            <div id="inputfoot">
+              <span>enter — отправить · shift+enter — новая строка</span>
+              <span id="quota-line">—</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div id="guide">
+      <div class="ghead"><span>// ПАМЯТКА: ЧТО Я УМЕЮ</span><span id="guideclose">✕</span></div>
+      <div id="guidebody"></div>
+      <div id="guidefoot">Отвечаю только по базе Brandis. Чем точнее вводные — ниша, город, бюджет — тем точнее подбор.</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  /* ===================== Starfield ===================== */
+  const canvas = document.getElementById("space");
+  const ctx = canvas.getContext("2d");
+  const mouse = {x:-999,y:-999};
+  let stars = [], meteors = [], t = 0, raf;
+
+  function sizeCanvas(){
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = window.innerWidth * dpr;
+    canvas.height = window.innerHeight * dpr;
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+  function build(div, opts){
+    const n = Math.round(window.innerWidth * window.innerHeight / div);
+    return Array.from({length:n}, () => ({
+      x: Math.random()*window.innerWidth, y: Math.random()*window.innerHeight,
+      r: Math.random()*opts.r + opts.rMin,
+      vx: (Math.random()-0.5)*opts.v, vy: (Math.random()-0.5)*opts.v,
+      a: Math.random()*opts.a + opts.aMin, tw: Math.random()*0.02+0.004, ph: Math.random()*6.28,
+      push: opts.push, warm: Math.random() > 0.78
+    }));
+  }
+  function buildAll(){
+    return [
+      ...build(5200, {r:0.7, rMin:0.25, v:0.03, a:0.22, aMin:0.06, push:8}),
+      ...build(11000, {r:1.4, rMin:0.5, v:0.1, a:0.5, aMin:0.2, push:28})
+    ];
+  }
+  function spawnMeteor(){
+    meteors.push({x: Math.random()*window.innerWidth*1.1, y:-60, len: 90+Math.random()*120, sp: 5+Math.random()*5, a: 0.7});
+  }
+
+  function step(){
+    t += 1;
+    ctx.clearRect(0,0,window.innerWidth,window.innerHeight);
+    if (Math.random() < 0.006) spawnMeteor();
+    for (const s of stars){
+      s.x += s.vx; s.y += s.vy;
+      if (s.x < 0) s.x = window.innerWidth; if (s.x > window.innerWidth) s.x = 0;
+      if (s.y < 0) s.y = window.innerHeight; if (s.y > window.innerHeight) s.y = 0;
+      const dx = s.x - mouse.x, dy = s.y - mouse.y;
+      const d2 = dx*dx + dy*dy;
+      let px = s.x, py = s.y;
+      if (d2 < 22000){
+        const d = Math.sqrt(d2) || 1;
+        const push = (1 - d/148) * s.push;
+        px += (dx/d)*push; py += (dy/d)*push;
+      }
+      const alpha = s.a * (0.6 + 0.4*Math.sin(t*s.tw + s.ph));
+      ctx.beginPath();
+      ctx.fillStyle = s.warm ? "rgba(255,138,82,"+alpha+")" : "rgba(226,220,208,"+(alpha*0.75)+")";
+      ctx.arc(px, py, s.r, 0, 6.2832);
+      ctx.fill();
+    }
+    meteors = meteors.filter(m => m.y < window.innerHeight+120 && m.a > 0.02);
+    for (const m of meteors){
+      m.x += m.sp*0.7; m.y += m.sp; m.a *= 0.995;
+      const g = ctx.createLinearGradient(m.x, m.y, m.x - m.len*0.7, m.y - m.len);
+      g.addColorStop(0, "rgba(255,138,82,"+m.a+")");
+      g.addColorStop(1, "rgba(255,138,82,0)");
+      ctx.strokeStyle = g; ctx.lineWidth = 1.2;
+      ctx.beginPath(); ctx.moveTo(m.x, m.y); ctx.lineTo(m.x - m.len*0.7, m.y - m.len); ctx.stroke();
+    }
+    raf = requestAnimationFrame(step);
+  }
+  sizeCanvas(); stars = buildAll(); step();
+  window.addEventListener("resize", () => { sizeCanvas(); stars = buildAll(); });
+  window.addEventListener("mousemove", (e) => { mouse.x = e.clientX; mouse.y = e.clientY; });
+
+  /* ===================== Responsive header ===================== */
+  const burger = document.getElementById("burger");
+  const mobilemenu = document.getElementById("mobilemenu");
+  burger.addEventListener("click", () => {
+    mobilemenu.style.display = mobilemenu.style.display === "flex" ? "none" : "flex";
+  });
+
+  const guide = document.getElementById("guide");
+  const guidetoggle = document.getElementById("guidetoggle");
+ const guideclose = document.getElementById("guideclose");
+  guidetoggle.addEventListener("click", () => guide.classList.add("open"));
+  guideclose.addEventListener("click", () => guide.classList.remove("open"));
+
+  /* ===================== Skills sidebar ===================== */
+  const SKILLS = [
+    {n:"01", title:"Подбор блогеров", hint:"Ниша, город, охваты — подберу подходящих блогеров из базы", ask:"Нужен блогер для рекламы: подскажи, кого спросить про нишу и город?"},
+    {n:"02", title:"Подбор брендов", hint:"Найду бренды, открытые к бартеру или платной коллаборации", ask:"Я блогер, ищу бренд для коллаборации"},
+    {n:"03", title:"Кросс-промо", hint:"Подберу блогера для совместного промо и обмена аудиторией", ask:"Ищу блогера для кросс-промо, у меня свой аккаунт"},
+    {n:"04", title:"Статистика базы", hint:"Отвечу точными цифрами: сколько блогеров и брендов в базе", ask:"Сколько всего блогеров и брендов сейчас в базе?"}
+  ];
+  const guidebody = document.getElementById("guidebody");
+  SKILLS.forEach(s => {
+    const div = document.createElement("div");
+    div.className = "skill";
+    div.innerHTML = '<div class="head"><span class="num">'+s.n+'</span><span class="title">'+s.title+'</span></div><div class="hint">'+s.hint+'</div>';
+    div.addEventListener("click", () => { guide.classList.remove("open"); ask(s.ask); });
+    guidebody.appendChild(div);
+  });
+
+  const PRESETS = [
+    {tag:"[01]", text:"Нужен фуд-блогер в Рязани до 30к подписчиков"},
+    {tag:"[02]", text:"Я блогер, ищу бренд для бартера"},
+    {tag:"[03]", text:"Хочу кросс-промо с другим блогером"},
+    {tag:"[04]", text:"Сколько блогеров и брендов сейчас в базе?"}
+  ];
+
+  /* ===================== Реальная логика чата (как в widget/chat.html) ===================== */
+  const API_BASE = window.BRANDIS_API_URL || "";
+
+  const authGate = document.getElementById("authgate");
+  const authWait = document.getElementById("authwait");
+  const tgLink = document.getElementById("tg-link");
+  const chatApp = document.getElementById("chatapp");
+  const thread = document.getElementById("thread");
+  const scrollarea = document.getElementById("scrollarea");
+  const input = document.getElementById("input");
+  const sendBtn = document.getElementById("send");
+  const quotaLine = document.getElementById("quota-line");
+
+  let accessToken = localStorage.getItem("brandis_access_token") || null;
+  let pollTimer = null;
+  let hasMessages = false;
+
+  function authHeaders(extra){
+    return Object.assign({ "Content-Type": "application/json", "Authorization": "Bearer " + accessToken }, extra || {});
+  }
+  function forgetAuthAndReload(){
+    localStorage.removeItem("brandis_access_token");
+    localStorage.removeItem("brandis_session_code");
+    location.reload();
+  }
+
+  function escapeHtml(str){
+    return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+  function linkify(text){
+    let escaped = escapeHtml(text);
+    escaped = escaped.replace(/\*\*([^*\n]+)\*\*/g, '<strong>$1</strong>');
+    escaped = escaped.replace(/\[([^\]\n]+)\]\((https?:\/\/[^\s)]+)\)/g,
+      '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+    escaped = escaped.replace(/(^|[^"'>])(https?:\/\/[^\s<]+)/g,
+      '$1<a href="$2" target="_blank" rel="noopener noreferrer">$2</a>');
+    return escaped;
+  }
+
+  function renderEmptyState(){
+    thread.innerHTML = '';
+    const wrap = document.createElement("div");
+    wrap.id = "empty";
+    wrap.innerHTML =
+      '<div class="tag">// AI BRANDIS</div>' +
+      '<h2>Опишите задачу —<br>дальше подберу варианты</h2>' +
+      '<p>Подберу блогеров и бренды из базы Brandis под вашу задачу. Чем точнее вводные — ниша, город, бюджет — тем точнее подбор.</p>' +
+      '<div class="label">// С ЧЕГО НАЧАТЬ</div>' +
+      '<div id="presets"></div>';
+    thread.appendChild(wrap);
+    const presetsEl = wrap.querySelector("#presets");
+    PRESETS.forEach(p => {
+      const div = document.createElement("div");
+      div.className = "preset";
+      div.innerHTML = '<span class="tag">'+p.tag+'</span><span class="txt">'+p.text+'</span>';
+      div.addEventListener("click", () => ask(p.text));
+      presetsEl.appendChild(div);
+    });
+  }
+
+  function scrollDown(){ requestAnimationFrame(() => { scrollarea.scrollTop = scrollarea.scrollHeight; }); }
+
+  function addMessage(role, text){
+    if (!hasMessages){ hasMessages = true; thread.innerHTML = ''; }
+    const row = document.createElement("div");
+    row.className = "row " + (role === "user" ? "user" : "bot");
+    const label = document.createElement("div");
+    label.className = "rowlabel";
+    label.textContent = role === "user" ? "ВЫ" : "AI BRANDIS";
+    const bubble = document.createElement("div");
+    bubble.className = "bubble";
+    if (role === "user") bubble.textContent = text;
+    else bubble.innerHTML = linkify(text);
+    row.appendChild(label); row.appendChild(bubble);
+    thread.appendChild(row);
+    scrollDown();
+    return row;
+  }
+
+  function addTyping(){
+    if (!hasMessages){ hasMessages = true; thread.innerHTML = ''; }
+    const row = document.createElement("div");
+    row.className = "row bot";
+    row.innerHTML = '<div class="rowlabel">AI BRANDIS</div><div class="typing-dots"><span></span><span></span><span></span></div>';
+    thread.appendChild(row);
+    scrollDown();
+    return row;
+  }
+
+  function addPaywall({ message, cta }){
+    if (!hasMessages){ hasMessages = true; thread.innerHTML = ''; }
+    const row = document.createElement("div");
+    row.className = "row bot";
+    const box = document.createElement("div");
+    box.className = "paywall";
+    const p = document.createElement("div");
+    p.className = "msg"; p.textContent = message;
+    box.appendChild(p);
+    const actions = document.createElement("div");
+    actions.className = "paywall-actions";
+    if (cta === "subscribe"){
+      const btn = document.createElement("button");
+      btn.className = "paywall-btn primary";
+      btn.textContent = "Оформить подписку";
+      btn.onclick = () => startPayment("/api/billing/subscribe");
+      actions.appendChild(btn);
+    }
+    if (cta === "addon"){
+      const btn = document.createElement("button");
+      btn.className = "paywall-btn primary";
+      btn.textContent = "Докупить поиски";
+      btn.onclick = () => startPayment("/api/billing/addon");
+      actions.appendChild(btn);
+    }
+    box.appendChild(actions);
+    row.innerHTML = '<div class="rowlabel">AI BRANDIS</div>';
+    row.appendChild(box);
+    thread.appendChild(row);
+    scrollDown();
+  }
+
+  async function startPayment(endpoint){
+    try {
+      const res = await fetch(API_BASE + endpoint, { method: "POST", headers: authHeaders() });
+      const data = await res.json();
+      if (data.confirmation_url) window.location.href = data.confirmation_url;
+      else addMessage("bot", "Не получилось создать платёж. Попробуй ещё раз чуть позже.");
+    } catch (e) {
+      addMessage("bot", "Не получилось создать платёж. Попробуй ещё раз чуть позже.");
+    }
+  }
+
+  function updateQuota(billing){
+    if (!billing){ quotaLine.textContent = "AI может ошибаться"; return; }
+    let text;
+    if (billing.subscriptionStatus === "active"){
+      const left = Math.max(billing.subscriptionIncludedSearches - billing.searchesUsedThisPeriod, 0);
+      text = left > 0 ? "осталось " + left + "/" + billing.subscriptionIncludedSearches + " в этом периоде" : "+" + billing.addonSearchesRemaining + " докуплено";
+    } else {
+      text = billing.freeSearchUsed ? "бесплатный подбор использован" : "1 бесплатный подбор доступен";
+    }
+    quotaLine.textContent = text + " · AI может ошибаться";
+  }
+
+  async function startAuth(){
+    let sessionCode = localStorage.getItem("brandis_session_code");
+    if (!sessionCode){
+      sessionCode = crypto.randomUUID();
+      localStorage.setItem("brandis_session_code", sessionCode);
+    }
+    try {
+      const res = await fetch(API_BASE + "/api/auth/start", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ session_code: sessionCode }),
+      });
+      const data = await res.json();
+      if (data.bot_username) tgLink.href = "https://t.me/" + data.bot_username + "?start=" + sessionCode;
+      tgLink.addEventListener("click", () => {
+        authWait.classList.add("show");
+        pollAuthStatus(sessionCode);
+      });
+    } catch(e) { /* пользователь увидит нерабочую ссылку — не критично для первичной проверки */ }
+  }
+
+  function pollAuthStatus(sessionCode){
+    if (pollTimer) clearInterval(pollTimer);
+    pollTimer = setInterval(async () => {
+      try {
+        const res = await fetch(API_BASE + "/api/auth/status?session_code=" + encodeURIComponent(sessionCode));
+        const data = await res.json();
+        if (data.linked && data.access_token){
+          clearInterval(pollTimer);
+          accessToken = data.access_token;
+          localStorage.setItem("brandis_access_token", accessToken);
+          localStorage.removeItem("brandis_session_code");
+          enterChat();
+        }
+      } catch(e) {}
+    }, 2000);
+  }
+
+  async function enterChat(){
+    authGate.style.display = "none";
+    chatApp.classList.add("show");
+    renderEmptyState();
+
+    try {
+      const res = await fetch(API_BASE + "/api/chat/bootstrap", { headers: authHeaders() });
+      if (res.status === 401){ forgetAuthAndReload(); return; }
+      if (!res.ok) throw new Error("bootstrap failed");
+      const data = await res.json();
+      updateQuota(data.billing);
+      if (data.history && data.history.length){
+        data.history.forEach(m => addMessage(m.role, m.content));
+      }
+    } catch(e) {
+      updateQuota(null);
+    }
+  }
+
+  async function ask(text){
+    if (!text || !text.trim() || sendBtn.disabled) return;
+    input.value = ""; input.style.height = "auto";
+    sendBtn.disabled = true;
+    addMessage("user", text.trim());
+    const typingEl = addTyping();
+
+    try {
+      const res = await fetch(API_BASE + "/api/v2/chat", {
+        method: "POST", headers: authHeaders(),
+        body: JSON.stringify({ message: text.trim() }),
+      });
+      const data = await res.json();
+      typingEl.remove();
+
+      if (res.status === 401){ forgetAuthAndReload(); return; }
+      if (res.status === 402){
+        addPaywall(data);
+        updateQuota(data.billing);
+        return;
+      }
+      if (!res.ok){ addMessage("bot", "Что-то пошло не так. Попробуй ещё раз чуть позже."); return; }
+
+      addMessage("bot", data.reply);
+      updateQuota(data.billing);
+    } catch(e) {
+      typingEl.remove();
+      addMessage("bot", "Не получилось связаться с сервером. Попробуй чуть позже.");
+    } finally {
+      sendBtn.disabled = false;
+    }
+  }
+  window.ask = ask;
+
+  function send(){ ask(input.value); }
+  sendBtn.addEventListener("click", send);
+  input.addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.shiftKey){ e.preventDefault(); send(); } });
+  input.addEventListener("input", () => { input.style.height = "auto"; input.style.height = Math.min(input.scrollHeight, 130) + "px"; });
+
+  if (accessToken) enterChat();
+  else startAuth();
+})();
+</script>
+</body>
+</html>
+  ];

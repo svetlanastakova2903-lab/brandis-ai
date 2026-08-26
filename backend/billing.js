@@ -32,7 +32,7 @@ export function checkAccess(user) {
     return {
       allowed: false,
       reason: "addon_needed",
-      message: `Лимит подписки исчерпан (${SUBSCRIPTION_INCLUDED_SEARCHES} поисков в этом периоде). Можно докупить +${ADDON_SEARCHES} поисков за ${ADDON_PRICE_RUB}₽.`,
+      message: `Лимит подписки исчерпан (${SUBSCRIPTION_INCLUDED_SEARCHES} подборов в этом периоде). Можно докупить +${ADDON_SEARCHES} подборов за ${ADDON_PRICE_RUB}₽.`,
       cta: "addon",
     };
   }
@@ -41,10 +41,15 @@ export function checkAccess(user) {
     return { allowed: true, billedAs: "free" };
   }
 
+  // Пакет подборов можно купить и без подписки — тогда он и расходуется первым.
+  if (user.addon_searches_remaining > 0) {
+    return { allowed: true, billedAs: "addon" };
+  }
+
   return {
     allowed: false,
     reason: "subscription_needed",
-    message: `Бесплатный поиск уже использован. Оформи подписку ${SUBSCRIPTION_PRICE_RUB}₽/мес — это ${SUBSCRIPTION_INCLUDED_SEARCHES} поисков в месяц.`,
+    message: `Бесплатный подбор уже использован. Оформи подписку ${SUBSCRIPTION_PRICE_RUB}₽/мес — это ${SUBSCRIPTION_INCLUDED_SEARCHES} подборов в месяц, или разовый пакет ${ADDON_PRICE_RUB}₽ — ${ADDON_SEARCHES} подборов.`,
     cta: "subscribe",
   };
 }
@@ -93,15 +98,11 @@ export async function startSubscription(telegramId, returnUrl) {
 }
 
 /**
- * Создаёт ссылку на оплату разового пакета +20 поисков. Доступно только когда лимит подписки исчерпан.
+ * Создаёт ссылку на оплату разового пакета +20 подборов. Доступно всем авторизованным.
  */
 export async function startAddonPurchase(telegramId, returnUrl) {
   const user = await db.getUser(telegramId);
   if (!user) throw new Error("Пользователь не найден");
-  if (!(user.subscription_status === "active" && user.searches_used_this_period >= SUBSCRIPTION_INCLUDED_SEARCHES)) {
-    throw new Error("Пакет +20 поисков доступен только после исчерпания лимита подписки.");
-  }
-
   const payment = await yookassa.createAddonPayment({ telegramId, returnUrl });
   await db.insertPayment(telegramId, {
     yookassaPaymentId: payment.id,

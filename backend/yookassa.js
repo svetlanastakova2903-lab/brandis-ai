@@ -73,14 +73,14 @@ export async function chargeSubscriptionRenewal({ telegramId, paymentMethodId })
 }
 
 /**
- * Разовый платёж за пакет +20 поисков.
+ * Разовый платёж за пакет +20 подборов.
  */
 export async function createAddonPayment({ telegramId, returnUrl }) {
   return yookassaFetch("/payments", {
     amount: { value: "299.00", currency: "RUB" },
     capture: true,
     confirmation: { type: "redirect", return_url: returnUrl },
-    description: "Пакет +20 поисков Brandis AI — 299₽",
+    description: "Пакет +20 подборов Brandis AI — 299₽",
     metadata: { telegram_id: String(telegramId), type: "addon" },
   });
 }

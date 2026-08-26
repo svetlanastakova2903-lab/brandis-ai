@@ -5,6 +5,32 @@ export const SUBSCRIPTION_PRICE_RUB = 999;
 export const ADDON_PRICE_RUB = 299;
 export const SUBSCRIPTION_INCLUDED_SEARCHES = 50;
 export const ADDON_SEARCHES = 20;
+
+/**
+ * Пакеты подборов — основной (и пока единственный) способ оплаты. Подписку продавать перестали:
+ * ЮKassa не даёт делать автосписания без отдельного согласования, да и спрос тут вспышками,
+ * а не помесячный. Купленные подборы не сгорают.
+ */
+export const PACKS = [
+  { id: "s", searches: 3, priceRub: 390, title: "3 подбора" },
+  { id: "m", searches: 10, priceRub: 990, title: "10 подборов" },
+  { id: "l", searches: 30, priceRub: 2790, title: "30 подборов" },
+];
+
+export const DEFAULT_PACK_ID = "m";
+
+export function getPack(packId) {
+  return PACKS.find((p) => p.id === packId) || PACKS.find((p) => p.id === DEFAULT_PACK_ID);
+}
+
+// Сколько сообщений подряд без выдачи подборки терпим, прежде чем закрыть запрос принудительно.
+// Каждое сообщение — это отдельный вызов модели, поэтому без потолка себестоимость подбора
+// ничем не ограничена. Пользователь потолка не видит: сначала модель получает подсказку сузить
+// запрос (SOFT), потом прямое указание выдать подборку (MUST), и только если и это не сработало —
+// сервер засчитывает подбор сам (HARD).
+export const TURNS_SOFT_NUDGE = 5;
+export const TURNS_MUST_DELIVER = 8;
+export const TURNS_HARD_CAP = 10;
 export const MAX_RENEWAL_ATTEMPTS = 3; // после стольких неудачных попыток подряд — подписка деактивируется
 
 /**
@@ -32,8 +58,8 @@ export function checkAccess(user) {
     return {
       allowed: false,
       reason: "addon_needed",
-      message: `Лимит подписки исчерпан (${SUBSCRIPTION_INCLUDED_SEARCHES} подборов в этом периоде). Можно докупить +${ADDON_SEARCHES} подборов за ${ADDON_PRICE_RUB}₽.`,
-      cta: "addon",
+      message: `Лимит подписки исчерпан (${SUBSCRIPTION_INCLUDED_SEARCHES} подборов в этом периоде). Можно докупить пакет: 3 за ${PACKS[0].priceRub}₽, 10 за ${PACKS[1].priceRub}₽ или 30 за ${PACKS[2].priceRub}₽.`,
+      cta: "pack",
     };
   }
 
@@ -48,9 +74,9 @@ export function checkAccess(user) {
 
   return {
     allowed: false,
-    reason: "subscription_needed",
-    message: `Бесплатный подбор уже использован. Оформи подписку ${SUBSCRIPTION_PRICE_RUB}₽/мес — это ${SUBSCRIPTION_INCLUDED_SEARCHES} подборов в месяц, или разовый пакет ${ADDON_PRICE_RUB}₽ — ${ADDON_SEARCHES} подборов.`,
-    cta: "subscribe",
+    reason: "pack_needed",
+    message: `Бесплатный подбор уже использован. Дальше — пакет подборов: 3 за ${PACKS[0].priceRub}₽, 10 за ${PACKS[1].priceRub}₽ или 30 за ${PACKS[2].priceRub}₽. Подборы не сгорают.`,
+    cta: "pack",
   };
 }
 
@@ -60,6 +86,7 @@ export function checkAccess(user) {
  */
 export async function recordSearchCompleted(telegramId, { billedAs, intent, model, inputTokens, outputTokens }) {
   await db.insertSearchEvent(telegramId, { billedAs, intent, model, inputTokens, outputTokens });
+  await db.query(`UPDATE users SET turns_since_search = 0, updated_at = now() WHERE telegram_id = $1`, [telegramId]);
 
   if (billedAs === "free") {
     await db.updateUser(telegramId, { free_search_used: true });
@@ -100,18 +127,24 @@ export async function startSubscription(telegramId, returnUrl) {
 /**
  * Создаёт ссылку на оплату разового пакета +20 подборов. Доступно всем авторизованным.
  */
-export async function startAddonPurchase(telegramId, returnUrl) {
+export async function startPackPurchase(telegramId, packId, returnUrl) {
   const user = await db.getUser(telegramId);
   if (!user) throw new Error("Пользователь не найден");
-  const payment = await yookassa.createAddonPayment({ telegramId, returnUrl });
+  const pack = getPack(packId);
+  const payment = await yookassa.createPackPayment({ telegramId, pack, returnUrl });
   await db.insertPayment(telegramId, {
     yookassaPaymentId: payment.id,
-    type: "addon",
-    amountRub: ADDON_PRICE_RUB,
+    type: "pack",
+    amountRub: pack.priceRub,
     status: payment.status,
     rawPayload: payment,
   });
   return payment.confirmation?.confirmation_url;
+}
+
+// Старое имя — оставлено, чтобы уже открытые у людей вкладки со старым фронтендом не сломались.
+export async function startAddonPurchase(telegramId, returnUrl) {
+  return startPackPurchase(telegramId, DEFAULT_PACK_ID, returnUrl);
 }
 
 /**
@@ -150,14 +183,17 @@ export async function applySucceededPayment(payment) {
       addon_searches_remaining: 0,
       renewal_failed_attempts: 0,
     });
-  } else if (type === "addon") {
-    const user = await db.getUser(telegramId);
-    await db.query(
-      `UPDATE users SET addon_searches_remaining = addon_searches_remaining + $2,
-                          addon_expires_at = $3, updated_at = now()
-       WHERE telegram_id = $1`,
-      [telegramId, ADDON_SEARCHES, user?.subscription_period_end || null]
-    );
+  } else if (type === "pack" || type === "addon") {
+    // Пакет не сгорает: срок не ставим вовсе. Старые платежи с type "addon" зачисляем как +20.
+    const searches = type === "pack" ? Number(payment.metadata?.searches) || 0 : ADDON_SEARCHES;
+    if (searches > 0) {
+      await db.query(
+        `UPDATE users SET addon_searches_remaining = addon_searches_remaining + $2,
+                          addon_expires_at = NULL, updated_at = now()
+         WHERE telegram_id = $1`,
+        [telegramId, searches]
+      );
+    }
   }
 }
 
@@ -184,7 +220,7 @@ export async function applyFailedPayment(payment) {
       });
     }
   }
-  // subscription_initial / addon failed — ничего не меняем, пользователь просто не получил доступ,
+  // subscription_initial / pack failed — ничего не меняем, пользователь просто не получил доступ,
   // может попробовать оплатить ещё раз.
 }
 

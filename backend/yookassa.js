@@ -73,15 +73,21 @@ export async function chargeSubscriptionRenewal({ telegramId, paymentMethodId })
 }
 
 /**
- * Разовый платёж за пакет +20 подборов.
+ * Разовый платёж за пакет подборов. Сумма и количество берутся из каталога в billing.js,
+ * чтобы цена жила в одном месте, а не была зашита в двух файлах.
  */
-export async function createAddonPayment({ telegramId, returnUrl }) {
+export async function createPackPayment({ telegramId, pack, returnUrl }) {
   return yookassaFetch("/payments", {
-    amount: { value: "299.00", currency: "RUB" },
+    amount: { value: pack.priceRub.toFixed(2), currency: "RUB" },
     capture: true,
     confirmation: { type: "redirect", return_url: returnUrl },
-    description: "Пакет +20 подборов Brandis AI — 299₽",
-    metadata: { telegram_id: String(telegramId), type: "addon" },
+    description: `Brandis AI — ${pack.title} (${pack.priceRub}₽)`,
+    metadata: {
+      telegram_id: String(telegramId),
+      type: "pack",
+      pack_id: pack.id,
+      searches: String(pack.searches),
+    },
   });
 }
 

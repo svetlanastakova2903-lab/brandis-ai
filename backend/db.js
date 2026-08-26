@@ -71,6 +71,10 @@ export async function initSchema() {
     );
   `);
 
+  // Счётчик сообщений с момента последней выданной подборки. Добавляем отдельным ALTER:
+  // CREATE TABLE IF NOT EXISTS выше не меняет уже существующую таблицу.
+  await query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS turns_since_search INTEGER NOT NULL DEFAULT 0;`);
+
   await query(`
     CREATE TABLE IF NOT EXISTS messages (
       id            BIGSERIAL PRIMARY KEY,

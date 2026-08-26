@@ -182,13 +182,21 @@ function buildBaseSystemPrompt(bloggerCandidates, brandCandidates) {
 // v2 добавляет: краткое саммари предыдущей истории (если есть) + обязательный вызов инструмента
 // deliver_recommendations при выдаче итоговой подборки — это единственный надёжный сигнал
 // "поиск завершён" для биллинга (считаем по нему, а не по количеству сообщений).
-function buildSystemPromptV2(bloggerCandidates, brandCandidates, summary) {
+function buildSystemPromptV2(bloggerCandidates, brandCandidates, summary, turnsSinceSearch = 0) {
     const base = buildBaseSystemPrompt(bloggerCandidates, brandCandidates);
     const summaryBlock = summary
       ? `\n\nКОНТЕКСТ ПРЕДЫДУЩЕГО ДИАЛОГА С ЭТИМ ПОЛЬЗОВАТЕЛЕМ (сжатое саммари более ранней переписки, самые новые сообщения ниже идут дословно):\n${summary}`
           : "";
     const toolRule = `\n\n9. ОБЯЗАТЕЛЬНО: когда даёшь пользователю ИТОГОВУЮ подборку (2-5 вариантов, правило 4) — В ТОМ ЖЕ ОТВЕТЕ вызови инструмент deliver_recommendations с указанием intent и count, ПОМИМО обычного текстового ответа. Если вместо подборки задаёшь уточняющий вопрос или говоришь, что вариантов нет — НЕ вызывай инструмент.`;
-    return base + summaryBlock + toolRule;
+    // Пользователь про потолок не знает — он живёт только здесь, в промпте. Смысл: не дать
+    // диалогу бесконечно ходить по уточнениям, потому что каждое сообщение — отдельный вызов модели.
+    let pressure = "";
+    if (turnsSinceSearch >= billing.TURNS_MUST_DELIVER) {
+      pressure = `\n\n10. ВАЖНО: в этом запросе уже было много уточнений. Больше НЕ задавай уточняющих вопросов. Прямо в этом ответе дай лучшую подборку из имеющихся кандидатов (2-5 вариантов) и вызови deliver_recommendations. Если для идеального совпадения данных не хватает — всё равно покажи самые близкие варианты и честно скажи, чем они отличаются от запроса.`;
+    } else if (turnsSinceSearch >= billing.TURNS_SOFT_NUDGE) {
+      pressure = `\n\n10. Учти: уточнений в этом запросе уже было достаточно. Постарайся в этом ответе именно дать подборку, а не задать очередной вопрос. Если чего-то не хватает — сделай разумное предположение вслух и покажи варианты.`;
+    }
+    return base + summaryBlock + toolRule + pressure;
 }
 
 const DELIVER_RECOMMENDATIONS_TOOL = {
@@ -405,7 +413,8 @@ app.post("/api/v2/chat", requireAuth, async (req, res) => {
 
       const bloggerCandidates = prefilterEntities(BLOGGERS, messagesForPrefilter, { isBlogger: true });
           const brandCandidates = prefilterEntities(BRANDS, messagesForPrefilter, { isBlogger: false });
-          const system = buildSystemPromptV2(bloggerCandidates, brandCandidates, summary);
+      const turnsSinceSearch = user.turns_since_search || 0;
+          const system = buildSystemPromptV2(bloggerCandidates, brandCandidates, summary, turnsSinceSearch);
 
       const claudeMessages = [...recentMessages, { role: "user", content: message }];
 
@@ -425,15 +434,24 @@ app.post("/api/v2/chat", requireAuth, async (req, res) => {
       const toolUse = response.content.find((b) => b.type === "tool_use" && b.name === "deliver_recommendations");
           const searchCompleted = !!toolUse;
 
-      if (searchCompleted) {
+      // Тихий предохранитель: если модель и после прямого указания не выдала подборку, всё равно
+      // закрываем запрос — иначе один разговорчивый пользователь может стоить сколько угодно.
+      const forcedClose = !searchCompleted && turnsSinceSearch + 1 >= billing.TURNS_HARD_CAP;
+
+      if (searchCompleted || forcedClose) {
               await billing.recordSearchCompleted(telegramId, {
                         billedAs: access.billedAs,
-                        intent: toolUse.input?.intent,
+                        intent: toolUse?.input?.intent,
                         model: "claude-sonnet-4-6",
                         inputTokens: response.usage?.input_tokens,
                         outputTokens: response.usage?.output_tokens,
               });
               user = await db.getUser(telegramId); // обновлённые счётчики для ответа
+      } else {
+              await db.query(
+                        `UPDATE users SET turns_since_search = turns_since_search + 1, updated_at = now() WHERE telegram_id = $1`,
+                        [telegramId]
+              );
       }
 
       res.json({
@@ -464,6 +482,23 @@ app.post("/api/billing/subscribe", requireAuth, async (req, res) => {
     }
 });
 
+// Каталог пакетов — чтобы цена жила только в бэкенде, а фронтенд её просто показывал.
+app.get("/api/billing/packs", (req, res) => {
+    res.json({ packs: billing.PACKS });
+});
+
+app.post("/api/billing/pack", requireAuth, async (req, res) => {
+    try {
+          const returnUrl = (process.env.SITE_BASE_URL || PUBLIC_BASE_URL) + "/ai?payment=return";
+          const confirmationUrl = await billing.startPackPurchase(req.telegramId, req.body?.pack, returnUrl);
+          res.json({ confirmation_url: confirmationUrl });
+    } catch (err) {
+          console.error("Ошибка /api/billing/pack:", err);
+          res.status(400).json({ error: err.message || "Не удалось создать платёж за пакет." });
+    }
+});
+
+// Старый путь — оставлен для уже открытых вкладок со старым фронтендом.
 app.post("/api/billing/addon", requireAuth, async (req, res) => {
     try {
           const returnUrl = (process.env.SITE_BASE_URL || PUBLIC_BASE_URL) + "/ai?payment=return";

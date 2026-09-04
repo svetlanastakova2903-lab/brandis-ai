@@ -81,20 +81,20 @@
     "contact": "https://yandex.ru/maps/-/CPaiIQoj"
   },
   {
-    "name": "Hidden",
-    "city": "Москва",
-    "niche": [
-      "Еда и напитки"
-    ],
-    "contact": "https://yandex.ru/maps/-/CPaiIZN8"
-  },
-  {
     "name": "Connolly Station",
     "city": "Москва",
     "niche": [
       "Еда и напитки"
     ],
     "contact": "https://yandex.ru/maps/-/CPaiAGiC"
+  },
+  {
+    "name": "Hidden",
+    "city": "Москва",
+    "niche": [
+      "Еда и напитки"
+    ],
+    "contact": "https://yandex.ru/maps/-/CPaiIZN8"
   },
   {
     "name": "Тайная комната",
@@ -137,20 +137,20 @@
     "contact": "https://yandex.ru/maps/-/CPaiMSOw"
   },
   {
-    "name": "Под Мухой",
-    "city": "Москва",
-    "niche": [
-      "Еда и напитки"
-    ],
-    "contact": "https://yandex.ru/maps/-/CPaiM2kj"
-  },
-  {
     "name": "Белфаст",
     "city": "Москва",
     "niche": [
       "Еда и напитки"
     ],
     "contact": "https://yandex.ru/maps/-/CPaiAJ4V"
+  },
+  {
+    "name": "Под Мухой",
+    "city": "Москва",
+    "niche": [
+      "Еда и напитки"
+    ],
+    "contact": "https://yandex.ru/maps/-/CPaiM2kj"
   },
   {
     "name": "Моряк и чайка",
@@ -369,20 +369,20 @@
     "contact": "https://yandex.ru/maps/-/CPaieZ33"
   },
   {
-    "name": "Молодёжь",
-    "city": "Москва",
-    "niche": [
-      "Еда и напитки"
-    ],
-    "contact": "https://yandex.ru/maps/-/CPaie03D"
-  },
-  {
     "name": "Strelka bar",
     "city": "Москва",
     "niche": [
       "Еда и напитки"
     ],
     "contact": "https://yandex.ru/maps/-/CPaez285"
+  },
+  {
+    "name": "Молодёжь",
+    "city": "Москва",
+    "niche": [
+      "Еда и напитки"
+    ],
+    "contact": "https://yandex.ru/maps/-/CPaie03D"
   },
   {
     "name": "Rock-n-Roll",
@@ -641,20 +641,20 @@
     "contact": "https://yandex.ru/maps/-/CPaiyK6g"
   },
   {
-    "name": "Проект 6/2",
-    "city": "Москва",
-    "niche": [
-      "Еда и напитки"
-    ],
-    "contact": "https://yandex.ru/maps/-/CPaiyWzc"
-  },
-  {
     "name": "Mitzva Bar",
     "city": "Москва",
     "niche": [
       "Еда и напитки"
     ],
     "contact": "https://yandex.ru/maps/-/CPaerIIt"
+  },
+  {
+    "name": "Проект 6/2",
+    "city": "Москва",
+    "niche": [
+      "Еда и напитки"
+    ],
+    "contact": "https://yandex.ru/maps/-/CPaiyWzc"
   },
   {
     "name": "Бали Лаунж",
@@ -825,20 +825,20 @@
     "contact": "https://yandex.ru/maps/-/CPaiBY7x"
   },
   {
-    "name": "Кафе кальян",
-    "city": "Москва",
-    "niche": [
-      "Еда и напитки"
-    ],
-    "contact": "https://yandex.ru/maps/-/CPai5PyZ"
-  },
-  {
     "name": "Дублинец",
     "city": "Москва",
     "niche": [
       "Еда и напитки"
     ],
     "contact": "https://yandex.ru/maps/-/CPaenQjL"
+  },
+  {
+    "name": "Кафе кальян",
+    "city": "Москва",
+    "niche": [
+      "Еда и напитки"
+    ],
+    "contact": "https://yandex.ru/maps/-/CPai5PyZ"
   },
   {
     "name": "Бургерс Хаб",
@@ -857,20 +857,20 @@
     "contact": "https://yandex.ru/maps/-/CPaiBNi-"
   },
   {
-    "name": "Nagoya",
-    "city": "Москва",
-    "niche": [
-      "Еда и напитки"
-    ],
-    "contact": "https://yandex.ru/maps/-/CPaiBRKx"
-  },
-  {
     "name": "Perfumist Bar",
     "city": "Москва",
     "niche": [
       "Еда и напитки"
     ],
     "contact": "https://yandex.ru/maps/-/CPaejHKT"
+  },
+  {
+    "name": "Nagoya",
+    "city": "Москва",
+    "niche": [
+      "Еда и напитки"
+    ],
+    "contact": "https://yandex.ru/maps/-/CPaiBRKx"
   },
   {
     "name": "Mini Turkish Spot",
@@ -889,20 +889,20 @@
     "contact": "https://yandex.ru/maps/-/CPaiBGOX"
   },
   {
-    "name": "Complex Burger",
-    "city": "Москва",
-    "niche": [
-      "Еда и напитки"
-    ],
-    "contact": "https://yandex.ru/maps/-/CPaiBS0c"
-  },
-  {
     "name": "Mollie's",
     "city": "Москва",
     "niche": [
       "Еда и напитки"
     ],
     "contact": "https://yandex.ru/maps/-/CPaej6I0"
+  },
+  {
+    "name": "Complex Burger",
+    "city": "Москва",
+    "niche": [
+      "Еда и напитки"
+    ],
+    "contact": "https://yandex.ru/maps/-/CPaiBS0c"
   },
   {
     "name": "So Far Kebab",
@@ -2859,6 +2859,14 @@
     "contact": "https://yandex.ru/maps/-/CTAsmYjf"
   },
   {
+    "name": "Мавен",
+    "city": "Москва",
+    "niche": [
+      "Еда и напитки"
+    ],
+    "contact": "https://yandex.ru/maps/-/CPaayE9b"
+  },
+  {
     "name": "Airpools",
     "city": "Москва",
     "niche": [
@@ -2866,14 +2874,6 @@
       "Красота и здоровье"
     ],
     "contact": "https://yandex.ru/maps/-/CTAsqZ67"
-  },
-  {
-    "name": "Мавен",
-    "city": "Москва",
-    "niche": [
-      "Еда и напитки"
-    ],
-    "contact": "https://yandex.ru/maps/-/CPaayE9b"
   },
   {
     "name": "СССР",
@@ -3017,14 +3017,6 @@
     "contact": "https://yandex.ru/maps/-/CTAsf2Jo"
   },
   {
-    "name": "Мокко",
-    "city": "Москва",
-    "niche": [
-      "Еда и напитки"
-    ],
-    "contact": "https://yandex.ru/maps/-/CPaamUku"
-  },
-  {
     "name": "Центр-занарье",
     "city": "Москва",
     "niche": [
@@ -3032,6 +3024,14 @@
       "Красота и здоровье"
     ],
     "contact": "https://yandex.ru/maps/-/CTAsjTlJ"
+  },
+  {
+    "name": "Мокко",
+    "city": "Москва",
+    "niche": [
+      "Еда и напитки"
+    ],
+    "contact": "https://yandex.ru/maps/-/CPaamUku"
   },
   {
     "name": "Калужские термы",
@@ -4293,6 +4293,14 @@
     "contact": "https://yandex.ru/maps/-/CTEo5LO6"
   },
   {
+    "name": "Кутята coffee shop",
+    "city": "Москва",
+    "niche": [
+      "Еда и напитки"
+    ],
+    "contact": "https://yandex.ru/maps/-/CPaYiFYr"
+  },
+  {
     "name": "Подмосковная Ривьера",
     "city": "Москва",
     "niche": [
@@ -4301,14 +4309,6 @@
       "Еда и напитки"
     ],
     "contact": "https://yandex.ru/maps/-/CTEo6L6s"
-  },
-  {
-    "name": "Кутята coffee shop",
-    "city": "Москва",
-    "niche": [
-      "Еда и напитки"
-    ],
-    "contact": "https://yandex.ru/maps/-/CPaYiFYr"
   },
   {
     "name": "RiverClubSurf",
@@ -4919,6 +4919,14 @@
     "contact": "https://yandex.ru/maps/-/CTU-nE8-"
   },
   {
+    "name": "Дринкит",
+    "city": "Москва",
+    "niche": [
+      "Еда и напитки"
+    ],
+    "contact": "https://yandex.ru/maps/-/CPUv4DMj"
+  },
+  {
     "name": "Икс-сейлинг",
     "city": "Москва",
     "niche": [
@@ -4926,14 +4934,6 @@
       "Путешествия и отдых"
     ],
     "contact": "https://yandex.ru/maps/-/CTU-nVL0"
-  },
-  {
-    "name": "Дринкит",
-    "city": "Москва",
-    "niche": [
-      "Еда и напитки"
-    ],
-    "contact": "https://yandex.ru/maps/-/CPUv4DMj"
   },
   {
     "name": "Международный московский яхтенный порт",
@@ -5219,20 +5219,20 @@
     "contact": "https://yandex.ru/maps/-/CTb~zG3i"
   },
   {
-    "name": "I Like Wine",
-    "city": "Москва",
-    "niche": [
-      "Еда и напитки"
-    ],
-    "contact": "https://yandex.ru/maps/-/CTf46Wyn"
-  },
-  {
     "name": "Mátes Coffee",
     "city": "Москва",
     "niche": [
       "Еда и напитки"
     ],
     "contact": "https://yandex.ru/maps/-/CPaUz4m0"
+  },
+  {
+    "name": "I Like Wine",
+    "city": "Москва",
+    "niche": [
+      "Еда и напитки"
+    ],
+    "contact": "https://yandex.ru/maps/-/CTf46Wyn"
   },
   {
     "name": "Ухват",
@@ -5243,20 +5243,20 @@
     "contact": "https://yandex.ru/maps/-/CTf4bS10"
   },
   {
-    "name": "Брянский бык",
-    "city": "Москва",
-    "niche": [
-      "Еда и напитки"
-    ],
-    "contact": "https://yandex.ru/maps/-/CTf4fP1D"
-  },
-  {
     "name": "The Coffee Club",
     "city": "Москва",
     "niche": [
       "Еда и напитки"
     ],
     "contact": "https://yandex.ru/maps/-/CPaUrHyR"
+  },
+  {
+    "name": "Брянский бык",
+    "city": "Москва",
+    "niche": [
+      "Еда и напитки"
+    ],
+    "contact": "https://yandex.ru/maps/-/CTf4fP1D"
   },
   {
     "name": "Lele",
@@ -5275,20 +5275,20 @@
     "contact": "https://yandex.ru/maps/-/CTf4nWkn"
   },
   {
-    "name": "Ресторан Девкин ручей",
-    "city": "Москва",
-    "niche": [
-      "Еда и напитки"
-    ],
-    "contact": "https://yandex.ru/maps/-/CTf4vM2I"
-  },
-  {
     "name": "Momo Art Cafe",
     "city": "Москва",
     "niche": [
       "Еда и напитки"
     ],
     "contact": "https://yandex.ru/maps/-/CPaMB0I5"
+  },
+  {
+    "name": "Ресторан Девкин ручей",
+    "city": "Москва",
+    "niche": [
+      "Еда и напитки"
+    ],
+    "contact": "https://yandex.ru/maps/-/CTf4vM2I"
   },
   {
     "name": "Fettucciamo",
@@ -5403,20 +5403,20 @@
     "contact": "https://yandex.ru/maps/-/CTfeuA~B"
   },
   {
-    "name": "Лицей",
-    "city": "Москва",
-    "niche": [
-      "Еда и напитки"
-    ],
-    "contact": "https://yandex.ru/maps/-/CTfeFBLq"
-  },
-  {
     "name": "Ycp",
     "city": "Москва",
     "niche": [
       "Еда и напитки"
     ],
     "contact": "https://yandex.ru/maps/-/CPaM4M~p"
+  },
+  {
+    "name": "Лицей",
+    "city": "Москва",
+    "niche": [
+      "Еда и напитки"
+    ],
+    "contact": "https://yandex.ru/maps/-/CTfeFBLq"
   },
   {
     "name": "Ино М2",
@@ -5491,20 +5491,20 @@
     "contact": "https://yandex.ru/maps/-/CTfe6Lmy"
   },
   {
-    "name": "Четверг",
-    "city": "Москва",
-    "niche": [
-      "Еда и напитки"
-    ],
-    "contact": "https://yandex.ru/maps/-/CTfeb60O"
-  },
-  {
     "name": "Alternative coffee",
     "city": "Москва",
     "niche": [
       "Еда и напитки"
     ],
     "contact": "https://yandex.ru/maps/-/CPaMQDl4"
+  },
+  {
+    "name": "Четверг",
+    "city": "Москва",
+    "niche": [
+      "Еда и напитки"
+    ],
+    "contact": "https://yandex.ru/maps/-/CTfeb60O"
   },
   {
     "name": "Бушери выпечка",
@@ -5707,20 +5707,20 @@
     "contact": "https://yandex.ru/maps/-/CTf6EWY1"
   },
   {
-    "name": "Suecoffee",
-    "city": "Москва",
-    "niche": [
-      "Еда и напитки"
-    ],
-    "contact": "https://yandex.ru/maps/-/CPUtV6yt"
-  },
-  {
     "name": "Райский Пирожок",
     "city": "Москва",
     "niche": [
       "Еда и напитки"
     ],
     "contact": "https://yandex.ru/maps/-/CTf6IG9L"
+  },
+  {
+    "name": "Suecoffee",
+    "city": "Москва",
+    "niche": [
+      "Еда и напитки"
+    ],
+    "contact": "https://yandex.ru/maps/-/CPUtV6yt"
   },
   {
     "name": "Булошная",
@@ -16237,20 +16237,20 @@
     "contact": "https://yandex.ru/maps/org/v_nekotorom_tsarstve/1254021881/?ll=39.840274%2C54.730307&amp;z=13.95"
   },
   {
-    "name": "ГК «Старый город»",
-    "city": "Рязань",
-    "niche": [
-      "Путешествия и отдых"
-    ],
-    "contact": "https://yandex.ru/maps/org/stary_gorod/199441323161/?ll=39.740405%2C54.627598&amp;z=13.96"
-  },
-  {
     "name": "Отель «Рязань»",
     "city": "Рязань",
     "niche": [
       "Путешествия и отдых"
     ],
     "contact": "https://yandex.ru/maps/11/ryazan/?ll=39.759469%2C54.633511&amp;mode=poi&amp;poi%5Bpoint%5D=39.759543%2C54.633863&amp;poi%5Buri%5D=ymapsbm1%3A%2F%2Forg%3Foid%3D1377210901&amp;z=18.09"
+  },
+  {
+    "name": "ГК «Старый город»",
+    "city": "Рязань",
+    "niche": [
+      "Путешествия и отдых"
+    ],
+    "contact": "https://yandex.ru/maps/org/stary_gorod/199441323161/?ll=39.740405%2C54.627598&amp;z=13.96"
   },
   {
     "name": "Ресторан «Старгород»",
@@ -16485,20 +16485,20 @@
     "contact": "https://yandex.ru/maps/org/konyushenny_dvor/5116039716/?ll=39.740049%2C54.610564&amp;source=serp_navig&amp;z=16.7"
   },
   {
-    "name": "Галерея «Боровница»",
-    "city": "Рязань",
-    "niche": [
-      "Образование и развитие"
-    ],
-    "contact": "https://yandex.ru/maps/org/muzey_istorii_molodyozhnogo_dvizheniya/1086961006/?ll=39.743094%2C54.622508&amp;source=serp_navig&amp;z=16.7"
-  },
-  {
     "name": "Чайная «Сахароваръ»",
     "city": "Рязань",
     "niche": [
       "Еда и напитки"
     ],
     "contact": "https://yandex.ru/maps/11/ryazan/?ll=39.743165%2C54.633457&amp;mode=poi&amp;poi%5Bpoint%5D=39.743459%2C54.633534&amp;poi%5Buri%5D=ymapsbm1%3A%2F%2Forg%3Foid%3D244132805711&amp;source=serp_navig&amp;z="
+  },
+  {
+    "name": "Галерея «Боровница»",
+    "city": "Рязань",
+    "niche": [
+      "Образование и развитие"
+    ],
+    "contact": "https://yandex.ru/maps/org/muzey_istorii_molodyozhnogo_dvizheniya/1086961006/?ll=39.743094%2C54.622508&amp;source=serp_navig&amp;z=16.7"
   },
   {
     "name": "Окский биосферный заповедник",

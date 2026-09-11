@@ -1329,14 +1329,6 @@
     "contact": "https://yandex.ru/maps/-/CPS0QXif"
   },
   {
-    "name": "ЧаЕ клуб чайной культуры",
-    "city": "Москва",
-    "niche": [
-      "Еда и напитки"
-    ],
-    "contact": "https://yandex.ru/maps/-/CPvv7Gix"
-  },
-  {
     "name": "Чайная Каста",
     "city": "Москва",
     "niche": [
@@ -1351,6 +1343,14 @@
       "Еда и напитки"
     ],
     "contact": "https://yandex.ru/maps/-/CPS8EK12"
+  },
+  {
+    "name": "ЧаЕ клуб чайной культуры",
+    "city": "Москва",
+    "niche": [
+      "Еда и напитки"
+    ],
+    "contact": "https://yandex.ru/maps/-/CPvv7Gix"
   },
   {
     "name": "Чайная на Крутицах",
@@ -3017,6 +3017,14 @@
     "contact": "https://yandex.ru/maps/-/CTAsf2Jo"
   },
   {
+    "name": "Мокко",
+    "city": "Москва",
+    "niche": [
+      "Еда и напитки"
+    ],
+    "contact": "https://yandex.ru/maps/-/CPaamUku"
+  },
+  {
     "name": "Центр-занарье",
     "city": "Москва",
     "niche": [
@@ -3024,14 +3032,6 @@
       "Красота и здоровье"
     ],
     "contact": "https://yandex.ru/maps/-/CTAsjTlJ"
-  },
-  {
-    "name": "Мокко",
-    "city": "Москва",
-    "niche": [
-      "Еда и напитки"
-    ],
-    "contact": "https://yandex.ru/maps/-/CPaamUku"
   },
   {
     "name": "Калужские термы",

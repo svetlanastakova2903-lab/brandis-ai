@@ -606,6 +606,14 @@
     "niche": [
       "Еда и напитки"
     ],
+    "contact": "https://yandex.ru/maps/-/CPaiyBj4"
+  },
+  {
+    "name": "HookahPlace",
+    "city": "Москва",
+    "niche": [
+      "Еда и напитки"
+    ],
     "contact": "https://yandex.ru/maps/-/CPaiyJ03"
   },
   {
@@ -689,12 +697,28 @@
     "contact": "https://yandex.ru/maps/-/CPai5QmZ"
   },
   {
+    "name": "HookahPlace Futura",
+    "city": "Москва",
+    "niche": [
+      "Еда и напитки"
+    ],
+    "contact": "https://yandex.ru/maps/-/CPaiuW81"
+  },
+  {
     "name": "Журавли",
     "city": "Москва",
     "niche": [
       "Еда и напитки"
     ],
     "contact": "https://yandex.ru/maps/-/CPaenD3~"
+  },
+  {
+    "name": "HookahPlace 404",
+    "city": "Москва",
+    "niche": [
+      "Еда и напитки"
+    ],
+    "contact": "https://yandex.ru/maps/-/CPaiu2O8"
   },
   {
     "name": "Bobo Lounge",
@@ -1329,6 +1353,14 @@
     "contact": "https://yandex.ru/maps/-/CPS0QXif"
   },
   {
+    "name": "ЧаЕ клуб чайной культуры",
+    "city": "Москва",
+    "niche": [
+      "Еда и напитки"
+    ],
+    "contact": "https://yandex.ru/maps/-/CPvv7Gix"
+  },
+  {
     "name": "Чайная Каста",
     "city": "Москва",
     "niche": [
@@ -1343,14 +1375,6 @@
       "Еда и напитки"
     ],
     "contact": "https://yandex.ru/maps/-/CPS8EK12"
-  },
-  {
-    "name": "ЧаЕ клуб чайной культуры",
-    "city": "Москва",
-    "niche": [
-      "Еда и напитки"
-    ],
-    "contact": "https://yandex.ru/maps/-/CPvv7Gix"
   },
   {
     "name": "Чайная на Крутицах",
@@ -2191,6 +2215,14 @@
       "Красота и здоровье"
     ],
     "contact": "https://yandex.ru/maps/-/CPHXZV3M"
+  },
+  {
+    "name": "Городская клиническая больница № 1 имени Н.И. Пирогова",
+    "city": "Москва",
+    "niche": [
+      "Красота и здоровье"
+    ],
+    "contact": "https://yandex.ru/maps/-/CPHX66~X"
   },
   {
     "name": "Российский научный центр хирургии имени академика Б. В. Петровского, научно-клинический центр № 1",
@@ -3263,6 +3295,15 @@
     "contact": "https://yandex.ru/maps/-/CPa4VZzB"
   },
   {
+    "name": "Олимп",
+    "city": "Москва",
+    "niche": [
+      "Ивенты и развлечения",
+      "Красота и здоровье"
+    ],
+    "contact": "https://yandex.ru/maps/-/CTA1eZlE"
+  },
+  {
     "name": "Вымпел",
     "city": "Москва",
     "niche": [
@@ -3332,6 +3373,15 @@
       "Красота и здоровье"
     ],
     "contact": "https://yandex.ru/maps/-/CTA9QVPm"
+  },
+  {
+    "name": "Starfish",
+    "city": "Москва",
+    "niche": [
+      "Ивенты и развлечения",
+      "Красота и здоровье"
+    ],
+    "contact": "https://yandex.ru/maps/-/CTA9UV0m"
   },
   {
     "name": "Осьминожка",
@@ -3574,6 +3624,14 @@
     "contact": "https://yandex.ru/maps/-/CTADuFK0"
   },
   {
+    "name": "Coffeeshop Company",
+    "city": "Москва",
+    "niche": [
+      "Еда и напитки"
+    ],
+    "contact": "https://yandex.ru/maps/-/CPa4QQ5l"
+  },
+  {
     "name": "Клуб Панда",
     "city": "Москва",
     "niche": [
@@ -3581,14 +3639,6 @@
       "Красота и здоровье"
     ],
     "contact": "https://yandex.ru/maps/-/CTAHePlu"
-  },
-  {
-    "name": "Coffeeshop Company",
-    "city": "Москва",
-    "niche": [
-      "Еда и напитки"
-    ],
-    "contact": "https://yandex.ru/maps/-/CPa4QQ5l"
   },
   {
     "name": "Duya",
@@ -4029,6 +4079,15 @@
     "contact": "https://yandex.ru/maps/-/CTALvYJR"
   },
   {
+    "name": "Павлин",
+    "city": "Москва",
+    "niche": [
+      "Ивенты и развлечения",
+      "Красота и здоровье"
+    ],
+    "contact": "https://yandex.ru/maps/-/CTALrFYV"
+  },
+  {
     "name": "Квартира № 9",
     "city": "Москва",
     "niche": [
@@ -4105,6 +4164,15 @@
       "Еда и напитки"
     ],
     "contact": "https://yandex.ru/maps/-/CTEg6W1j"
+  },
+  {
+    "name": "Double Kiss",
+    "city": "Москва",
+    "niche": [
+      "Ивенты и развлечения",
+      "Красота и здоровье"
+    ],
+    "contact": "https://yandex.ru/maps/-/CTEgj612"
   },
   {
     "name": "Дуплет",
@@ -4469,6 +4537,15 @@
     "contact": "https://yandex.ru/maps/-/CTEsBRPA"
   },
   {
+    "name": "Маяк",
+    "city": "Москва",
+    "niche": [
+      "Ивенты и развлечения",
+      "Путешествия и отдых"
+    ],
+    "contact": "https://yandex.ru/maps/-/CTE1VMMP"
+  },
+  {
     "name": "Рассвет",
     "city": "Москва",
     "niche": [
@@ -4740,6 +4817,14 @@
     "contact": "https://yandex.ru/maps/-/CTUwVX5v"
   },
   {
+    "name": "Чашка настоящего",
+    "city": "Москва",
+    "niche": [
+      "Еда и напитки"
+    ],
+    "contact": "https://yandex.ru/maps/-/CPaY4ENQ"
+  },
+  {
     "name": "Орбита",
     "city": "Москва",
     "niche": [
@@ -4747,14 +4832,6 @@
       "Путешествия и отдых"
     ],
     "contact": "https://yandex.ru/maps/-/CTUw64L1"
-  },
-  {
-    "name": "Чашка настоящего",
-    "city": "Москва",
-    "niche": [
-      "Еда и напитки"
-    ],
-    "contact": "https://yandex.ru/maps/-/CPaY4ENQ"
   },
   {
     "name": "Центр яхтенной подготовки Amc",
@@ -5044,6 +5121,14 @@
     "contact": "https://yandex.ru/maps/-/CTUdEXNl"
   },
   {
+    "name": "ФоRмат Диемм Кофе",
+    "city": "Москва",
+    "niche": [
+      "Еда и напитки"
+    ],
+    "contact": "https://yandex.ru/maps/-/CPaYMBiV"
+  },
+  {
     "name": "Парусная школа",
     "city": "Москва",
     "niche": [
@@ -5051,14 +5136,6 @@
       "Путешествия и отдых"
     ],
     "contact": "https://yandex.ru/maps/-/CTUdIBpq"
-  },
-  {
-    "name": "ФоRмат Диемм Кофе",
-    "city": "Москва",
-    "niche": [
-      "Еда и напитки"
-    ],
-    "contact": "https://yandex.ru/maps/-/CPaYMBiV"
   },
   {
     "name": "Free Wind",
@@ -5603,12 +5680,28 @@
     "contact": "https://yandex.ru/maps/-/CPaMEIP6"
   },
   {
+    "name": "Франсуа",
+    "city": "Москва",
+    "niche": [
+      "Еда и напитки"
+    ],
+    "contact": "https://yandex.ru/maps/-/CTfVnMk3"
+  },
+  {
     "name": "Sandra Булок",
     "city": "Москва",
     "niche": [
       "Еда и напитки"
     ],
     "contact": "https://yandex.ru/maps/-/CTfZN42x"
+  },
+  {
+    "name": "Ухват",
+    "city": "Москва",
+    "niche": [
+      "Еда и напитки"
+    ],
+    "contact": "https://yandex.ru/maps/-/CTfZRUzg"
   },
   {
     "name": "Печорин",
@@ -5667,6 +5760,14 @@
     "contact": "https://yandex.ru/maps/-/CTfZnAmw"
   },
   {
+    "name": "La Роste",
+    "city": "Москва",
+    "niche": [
+      "Еда и напитки"
+    ],
+    "contact": "https://yandex.ru/maps/-/CTfZrYnT"
+  },
+  {
     "name": "Хлебная Мануфактура № 1",
     "city": "Москва",
     "niche": [
@@ -5681,6 +5782,14 @@
       "Еда и напитки"
     ],
     "contact": "https://yandex.ru/maps/-/CTfZzD3~"
+  },
+  {
+    "name": "Бублик",
+    "city": "Москва",
+    "niche": [
+      "Еда и напитки"
+    ],
+    "contact": "https://yandex.ru/maps/-/CTfZ7KKY"
   },
   {
     "name": "Аэроплан",
@@ -5707,20 +5816,20 @@
     "contact": "https://yandex.ru/maps/-/CTf6EWY1"
   },
   {
-    "name": "Райский Пирожок",
-    "city": "Москва",
-    "niche": [
-      "Еда и напитки"
-    ],
-    "contact": "https://yandex.ru/maps/-/CTf6IG9L"
-  },
-  {
     "name": "Suecoffee",
     "city": "Москва",
     "niche": [
       "Еда и напитки"
     ],
     "contact": "https://yandex.ru/maps/-/CPUtV6yt"
+  },
+  {
+    "name": "Райский Пирожок",
+    "city": "Москва",
+    "niche": [
+      "Еда и напитки"
+    ],
+    "contact": "https://yandex.ru/maps/-/CTf6IG9L"
   },
   {
     "name": "Булошная",
@@ -5745,6 +5854,14 @@
       "Еда и напитки"
     ],
     "contact": "https://yandex.ru/maps/-/CPUtVRZC"
+  },
+  {
+    "name": "Четверг",
+    "city": "Москва",
+    "niche": [
+      "Еда и напитки"
+    ],
+    "contact": "https://yandex.ru/maps/-/CTf6UZp~"
   },
   {
     "name": "Code Coffee",
@@ -6299,6 +6416,14 @@
     "contact": "https://yandex.ru/maps/-/CPUcqS3B"
   },
   {
+    "name": "Булошная",
+    "city": "Москва",
+    "niche": [
+      "Еда и напитки"
+    ],
+    "contact": "https://yandex.ru/maps/-/CPUcmDYd"
+  },
+  {
     "name": "Floo",
     "city": "Москва",
     "niche": [
@@ -6851,6 +6976,14 @@
     "contact": "https://yandex.ru/maps/-/CPUjY0Pn"
   },
   {
+    "name": "Petshop.ru",
+    "city": "Москва",
+    "niche": [
+      "Питомцы и зоотовары"
+    ],
+    "contact": "https://yandex.ru/maps/-/CPUjUXo4"
+  },
+  {
     "name": "Бетховен",
     "city": "Москва",
     "niche": [
@@ -7235,6 +7368,14 @@
     "contact": "https://yandex.ru/maps/-/CLhsvKkj"
   },
   {
+    "name": "Ваниль",
+    "city": "Москва",
+    "niche": [
+      "Красота и здоровье"
+    ],
+    "contact": "https://yandex.ru/maps/-/CLhsvUlI"
+  },
+  {
     "name": "Твоя история",
     "city": "Москва",
     "niche": [
@@ -7273,6 +7414,14 @@
       "Красота и здоровье"
     ],
     "contact": "https://yandex.ru/maps/-/CLhsjWZW"
+  },
+  {
+    "name": "Naturel Studio",
+    "city": "Москва",
+    "niche": [
+      "Красота и здоровье"
+    ],
+    "contact": "https://yandex.ru/maps/-/CLhsbP0q"
   },
   {
     "name": "Салон красоты Москва",
@@ -7955,6 +8104,14 @@
     "contact": "https://yandex.ru/maps/-/CLhJQMPB"
   },
   {
+    "name": "Топган",
+    "city": "Москва",
+    "niche": [
+      "Красота и здоровье"
+    ],
+    "contact": "https://yandex.ru/maps/-/CLhJMY1p"
+  },
+  {
     "name": "Schegol",
     "city": "Москва",
     "niche": [
@@ -8163,6 +8320,14 @@
     "contact": "https://yandex.ru/maps/-/CLhaQEy4"
   },
   {
+    "name": "Монс Бьюти",
+    "city": "Москва",
+    "niche": [
+      "Красота и здоровье"
+    ],
+    "contact": "https://yandex.ru/maps/-/CLhaMM1K"
+  },
+  {
     "name": "Genere mio",
     "city": "Москва",
     "niche": [
@@ -8243,12 +8408,28 @@
     "contact": "https://yandex.ru/maps/-/CLh4nT67"
   },
   {
+    "name": "Лето",
+    "city": "Москва",
+    "niche": [
+      "Красота и здоровье"
+    ],
+    "contact": "https://yandex.ru/maps/-/CLh4nU9l"
+  },
+  {
     "name": "Tulum Beauty Place",
     "city": "Москва",
     "niche": [
       "Красота и здоровье"
     ],
     "contact": "https://yandex.ru/maps/-/CLh4jKpE"
+  },
+  {
+    "name": "Маяк",
+    "city": "Москва",
+    "niche": [
+      "Красота и здоровье"
+    ],
+    "contact": "https://yandex.ru/maps/-/CLhYrZ~I"
   },
   {
     "name": "Celebrity",
@@ -8361,6 +8542,14 @@
       "Красота и здоровье"
     ],
     "contact": "https://yandex.ru/maps/-/CLhYFRMe"
+  },
+  {
+    "name": "Бьянка Люкс",
+    "city": "Москва",
+    "niche": [
+      "Красота и здоровье"
+    ],
+    "contact": "https://yandex.ru/maps/-/CLhY5W1Q"
   },
   {
     "name": "Budu",
@@ -8521,6 +8710,14 @@
       "Красота и здоровье"
     ],
     "contact": "https://yandex.ru/maps/-/CLhU7Uy8"
+  },
+  {
+    "name": "Персона",
+    "city": "Москва",
+    "niche": [
+      "Красота и здоровье"
+    ],
+    "contact": "https://yandex.ru/maps/-/CLhUzUze"
   },
   {
     "name": "Студия Правильной Стрижки",
@@ -9171,6 +9368,14 @@
     "contact": "https://yandex.ru/maps/-/CLd3rAIF"
   },
   {
+    "name": "Мидийное Место",
+    "city": "Москва",
+    "niche": [
+      "Еда и напитки"
+    ],
+    "contact": "https://yandex.ru/maps/-/CLd3fDi2"
+  },
+  {
     "name": "Osso",
     "city": "Москва",
     "niche": [
@@ -9803,6 +10008,14 @@
     "contact": "https://yandex.ru/maps/-/CLXnr-mT"
   },
   {
+    "name": "Kulēk",
+    "city": "Москва",
+    "niche": [
+      "Еда и напитки"
+    ],
+    "contact": "https://yandex.ru/maps/-/CLXnrF9P"
+  },
+  {
     "name": "Bao Bei",
     "city": "Москва",
     "niche": [
@@ -9841,6 +10054,14 @@
       "Еда и напитки"
     ],
     "contact": "https://yandex.ru/maps/-/CLH0N09L"
+  },
+  {
+    "name": "Kulēk",
+    "city": "Москва",
+    "niche": [
+      "Еда и напитки"
+    ],
+    "contact": "https://yandex.ru/maps/-/CLH0F0YZ"
   },
   {
     "name": "Карти",
@@ -10041,6 +10262,14 @@
       "Еда и напитки"
     ],
     "contact": "https://yandex.ru/maps/-/CLHK4Syg"
+  },
+  {
+    "name": "Rizz",
+    "city": "Москва",
+    "niche": [
+      "Еда и напитки"
+    ],
+    "contact": "https://yandex.ru/maps/-/CLHKULOQ"
   },
   {
     "name": "Dolce Far Niente",
@@ -11499,6 +11728,14 @@
     "contact": "https://yandex.ru/maps/-/CLwbNXp2"
   },
   {
+    "name": "Мясо&amp;Рыба",
+    "city": "Москва",
+    "niche": [
+      "Еда и напитки"
+    ],
+    "contact": "https://yandex.ru/maps/-/CLwbNJ5I"
+  },
+  {
     "name": "Steak it easy",
     "city": "Москва",
     "niche": [
@@ -12051,6 +12288,14 @@
     "contact": "https://yandex.ru/maps/-/CLs~5Op5"
   },
   {
+    "name": "Молоко",
+    "city": "Москва",
+    "niche": [
+      "Еда и напитки"
+    ],
+    "contact": "https://yandex.ru/maps/-/CLs~yYN-"
+  },
+  {
     "name": "Рамен-Клаб",
     "city": "Москва",
     "niche": [
@@ -12179,6 +12424,14 @@
     "contact": "https://yandex.ru/maps/-/CLs3fX8a"
   },
   {
+    "name": "Луч",
+    "city": "Москва",
+    "niche": [
+      "Еда и напитки"
+    ],
+    "contact": "https://yandex.ru/maps/-/CLsxYTYv"
+  },
+  {
     "name": "Avero mio",
     "city": "Москва",
     "niche": [
@@ -12281,6 +12534,14 @@
       "Еда и напитки"
     ],
     "contact": "https://yandex.ru/maps/-/CLstbAY~"
+  },
+  {
+    "name": "Порто Миконос",
+    "city": "Москва",
+    "niche": [
+      "Еда и напитки"
+    ],
+    "contact": "https://yandex.ru/maps/-/CLst6Y6w"
   },
   {
     "name": "Хлеб и Вино",
@@ -12513,6 +12774,14 @@
       "Еда и напитки"
     ],
     "contact": "https://yandex.ru/maps/-/CLcDIKyW"
+  },
+  {
+    "name": "Mátes Coffee",
+    "city": "Москва",
+    "niche": [
+      "Еда и напитки"
+    ],
+    "contact": "https://yandex.ru/maps/-/CLcDEGMH"
   },
   {
     "name": "Алтаргана",
@@ -12763,6 +13032,14 @@
     "contact": "https://yandex.ru/maps/-/CLccQJ-o"
   },
   {
+    "name": "КонтрРазведка",
+    "city": "Москва",
+    "niche": [
+      "Еда и напитки"
+    ],
+    "contact": "https://yandex.ru/maps/-/CLccM2mu"
+  },
+  {
     "name": "Старлайт Дайнер",
     "city": "Москва",
     "niche": [
@@ -12921,6 +13198,14 @@
       "Еда и напитки"
     ],
     "contact": "https://yandex.ru/maps/-/CLcSI2ZO"
+  },
+  {
+    "name": "Я тебя люля",
+    "city": "Москва",
+    "niche": [
+      "Еда и напитки"
+    ],
+    "contact": "https://yandex.ru/maps/-/CLcSIA4g"
   },
   {
     "name": "Dream",
@@ -13219,6 +13504,14 @@
     "contact": "https://yandex.ru/maps/-/CLcfYH~l"
   },
   {
+    "name": "Морская Школа",
+    "city": "Рязань",
+    "niche": [
+      "Красота и здоровье"
+    ],
+    "contact": "https://yandex.ru/maps/-/CLcfYIYq"
+  },
+  {
     "name": "Fit Home",
     "city": "Рязань",
     "niche": [
@@ -13401,6 +13694,14 @@
       "Красота и здоровье"
     ],
     "contact": "https://yandex.ru/maps/-/CLcb5Zm8"
+  },
+  {
+    "name": "Атмосфера",
+    "city": "Рязань",
+    "niche": [
+      "Красота и здоровье"
+    ],
+    "contact": "https://yandex.ru/maps/-/CLcbyW-R"
   },
   {
     "name": "Эксперт Клиник",
@@ -13587,6 +13888,14 @@
     "contact": "https://yandex.ru/maps/-/CLcRbO5y"
   },
   {
+    "name": "Клиника Фомина",
+    "city": "Рязань",
+    "niche": [
+      "Красота и здоровье"
+    ],
+    "contact": "https://yandex.ru/maps/-/CLcR6EL8"
+  },
+  {
     "name": "Люкс",
     "city": "Рязань",
     "niche": [
@@ -13617,6 +13926,14 @@
       "Красота и здоровье"
     ],
     "contact": "https://yandex.ru/maps/-/CLcRFIZC"
+  },
+  {
+    "name": "Он Клиник",
+    "city": "Рязань",
+    "niche": [
+      "Красота и здоровье"
+    ],
+    "contact": "https://yandex.ru/maps/-/CLcyjP2J"
   },
   {
     "name": "Доктор Детокс",
@@ -13825,6 +14142,14 @@
       "Питомцы и зоотовары"
     ],
     "contact": "https://yandex.ru/maps/-/CLcuu2i-"
+  },
+  {
+    "name": "Зоомагазин",
+    "city": "Рязань",
+    "niche": [
+      "Питомцы и зоотовары"
+    ],
+    "contact": "https://yandex.ru/maps/-/CLcuqM~f"
   },
   {
     "name": "Зооветмаркет",
@@ -14057,6 +14382,14 @@
       "Подарки и праздники"
     ],
     "contact": "https://yandex.ru/maps/-/CLGpNJy0"
+  },
+  {
+    "name": "Амур",
+    "city": "Рязань",
+    "niche": [
+      "Подарки и праздники"
+    ],
+    "contact": "https://yandex.ru/maps/-/CLGpFXNC"
   },
   {
     "name": "Milotta",
@@ -14510,6 +14843,14 @@
     "contact": "https://yandex.ru/maps/-/CLCeUG43"
   },
   {
+    "name": "Унция",
+    "city": "Рязань",
+    "niche": [
+      "Еда и напитки"
+    ],
+    "contact": "https://yandex.ru/maps/org/untsiya/173809092429/"
+  },
+  {
     "name": "Чеснок",
     "city": "Рязань",
     "niche": [
@@ -14735,6 +15076,14 @@
     "contact": "https://yandex.ru/maps/-/CLCZI-j5"
   },
   {
+    "name": "Небо",
+    "city": "Рязань",
+    "niche": [
+      "Еда и напитки"
+    ],
+    "contact": "https://yandex.ru/maps/-/CLCZM4~v"
+  },
+  {
     "name": "Поэт",
     "city": "Рязань",
     "niche": [
@@ -14789,6 +15138,14 @@
       "Еда и напитки"
     ],
     "contact": "https://yandex.ru/maps/-/CLCZQG99"
+  },
+  {
+    "name": "Барская пивница",
+    "city": "Рязань",
+    "niche": [
+      "Еда и напитки"
+    ],
+    "contact": "https://yandex.ru/maps/-/CLCZQ8J6"
   },
   {
     "name": "Иван Васильевич",
@@ -15035,6 +15392,14 @@
       "Еда и напитки"
     ],
     "contact": "https://yandex.ru/maps/-/CLCZeCIB"
+  },
+  {
+    "name": "Может, ко мне?",
+    "city": "Рязань",
+    "niche": [
+      "Еда и напитки"
+    ],
+    "contact": "https://yandex.ru/maps/-/CLCZeSpm"
   },
   {
     "name": "Может, ко мне?",
@@ -15742,6 +16107,14 @@
     "contact": "https://yandex.ru/maps/org/icity/105262224836/?ll=39.716638%2C54.628622&amp;z=17"
   },
   {
+    "name": "Hood",
+    "city": "Рязань",
+    "niche": [
+      "Красота и здоровье"
+    ],
+    "contact": "https://hoodbarbershop.com/#rec324925993"
+  },
+  {
     "name": "Oh My Brows",
     "city": "Рязань",
     "niche": [
@@ -16267,6 +16640,14 @@
       "Еда и напитки"
     ],
     "contact": "https://yandex.ru/maps/org/v_nekotorom_tsarstve/1254021881/?ll=39.840274%2C54.730307&amp;z=13.95"
+  },
+  {
+    "name": "Фикус",
+    "city": "Рязань",
+    "niche": [
+      "Дом и интерьер"
+    ],
+    "contact": "https://yandex.ru/maps/org/fikus/74203980529/?ll=39.731407%2C54.625051&amp;z=17"
   },
   {
     "name": "Ресторан «Сова» (итальянская)",

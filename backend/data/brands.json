@@ -17092,5 +17092,21 @@
       "Путешествия и отдых"
     ],
     "contact": "https://t.me/livny_project"
+  },
+  {
+    "name": "Olga Zohar",
+    "city": null,
+    "niche": [
+      "Ивенты и развлечения"
+    ],
+    "contact": null
+  },
+  {
+    "name": "Smart — институт психологии",
+    "city": "Москва",
+    "niche": [
+      "Образование и развитие"
+    ],
+    "contact": "https://t.me/oliivka"
   }
 ]

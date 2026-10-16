@@ -103,18 +103,6 @@
     "photo": "https://static.tildacdn.com/stor6431-3163-4233-b730-343130666436/dbd89e2daaffbbbef598bde1e1aa25f6.jpg"
   },
   {
-    "name": "ermshkvch.ugc",
-    "city": null,
-    "niche": [
-      "Красота и здоровье"
-    ],
-    "followers": 107,
-    "platform": "TikTok",
-    "contact": "https://www.tiktok.com/@ermshkvch.ugc?_r=1&amp;_t=ZS-9364fFuJ46x",
-    "profile_url": "https://www.tiktok.com/@ermshkvch.ugc?_r=1&amp;_t=ZS-9364fFuJ46x",
-    "photo": "https://static.tildacdn.com/stor6664-3830-4631-b138-363562383134/d427a2f2d5a402a383052f3ef80c2b9a.jpg"
-  },
-  {
     "name": "tanyaparadisee",
     "city": "Москва",
     "niche": [
@@ -125,6 +113,18 @@
     "contact": "https://www.instagram.com/tanyaparadisee?igsh=MWRxOWl2bTVtMnI1MQ==",
     "profile_url": "https://www.instagram.com/tanyaparadisee?igsh=MWRxOWl2bTVtMnI1MQ==",
     "photo": "https://static.tildacdn.com/stor6666-3863-4431-a563-366464323231/bd0d285c5862321a762f193cc55c8772.jpg"
+  },
+  {
+    "name": "ermshkvch.ugc",
+    "city": null,
+    "niche": [
+      "Красота и здоровье"
+    ],
+    "followers": 107,
+    "platform": "TikTok",
+    "contact": "https://www.tiktok.com/@ermshkvch.ugc?_r=1&amp;_t=ZS-9364fFuJ46x",
+    "profile_url": "https://www.tiktok.com/@ermshkvch.ugc?_r=1&amp;_t=ZS-9364fFuJ46x",
+    "photo": "https://static.tildacdn.com/stor6664-3830-4631-b138-363562383134/d427a2f2d5a402a383052f3ef80c2b9a.jpg"
   },
   {
     "name": "kokobrico",
@@ -502,6 +502,20 @@
     "photo": "https://static.tildacdn.com/stor6431-6136-4062-a637-653362386639/e7826e510579f0f3c6de1eac3d234b1a.jpg"
   },
   {
+    "name": "im.sofiia.ginger",
+    "city": "Москва",
+    "niche": [
+      "Красота и здоровье",
+      "Путешествия и отдых",
+      "Мода и стиль"
+    ],
+    "followers": 580,
+    "platform": "Инстаграм",
+    "contact": "https://www.instagram.com/im.sofiia.ginger?igsh=MTc2MXBmcWk5MnF6Mw==",
+    "profile_url": "https://www.instagram.com/im.sofiia.ginger?igsh=MTc2MXBmcWk5MnF6Mw==",
+    "photo": "https://static.tildacdn.com/stor3732-3936-4230-b161-623938343939/b6c7c69ede9901772b7b1efdd5791c2e.jpg"
+  },
+  {
     "name": "aleksarait",
     "city": "Рязань",
     "niche": [
@@ -515,20 +529,6 @@
     "contact": "http://instagram.com/AleksaRait",
     "profile_url": "http://instagram.com/AleksaRait",
     "photo": "https://static.tildacdn.com/stor3734-6666-4637-b965-623533636562/b6061e9b680726dd2e5b66f109494c5b.jpg"
-  },
-  {
-    "name": "im.sofiia.ginger",
-    "city": "Москва",
-    "niche": [
-      "Красота и здоровье",
-      "Путешествия и отдых",
-      "Мода и стиль"
-    ],
-    "followers": 580,
-    "platform": "Инстаграм",
-    "contact": "https://www.instagram.com/im.sofiia.ginger?igsh=MTc2MXBmcWk5MnF6Mw==",
-    "profile_url": "https://www.instagram.com/im.sofiia.ginger?igsh=MTc2MXBmcWk5MnF6Mw==",
-    "photo": "https://static.tildacdn.com/stor3732-3936-4230-b161-623938343939/b6c7c69ede9901772b7b1efdd5791c2e.jpg"
   },
   {
     "name": "dariya.strizhak",
@@ -573,18 +573,6 @@
     "photo": "https://static.tildacdn.com/stor6363-6137-4066-a633-393863363130/f0fa8840d7a6a69bbf750d5517eb4b4c.jpg"
   },
   {
-    "name": "alesya_metalnikova",
-    "city": "Москва",
-    "niche": [
-      "Красота и здоровье"
-    ],
-    "followers": 541,
-    "platform": "Инстаграм",
-    "contact": "https://www.instagram.com/alesya_metalnikova?igsh=MTZ3NHFhd280bHFpMA==",
-    "profile_url": "https://www.instagram.com/alesya_metalnikova?igsh=MTZ3NHFhd280bHFpMA==",
-    "photo": "https://static.tildacdn.com/stor3031-3333-4838-b562-623266306266/5873a2c581aef43d2b8316ff235b0e06.jpg"
-  },
-  {
     "name": "sshyneee",
     "city": "Рязань",
     "niche": [
@@ -595,6 +583,18 @@
     "contact": "https://www.instagram.com/sshyyneee?igsh=dzM4MnUxODg3ZWM1",
     "profile_url": "https://www.instagram.com/sshyyneee?igsh=dzM4MnUxODg3ZWM1",
     "photo": "https://static.tildacdn.com/stor3835-6135-4365-b561-303338656166/0a2f0c0a449611098191e04cbc0cdbab.jpg"
+  },
+  {
+    "name": "alesya_metalnikova",
+    "city": "Москва",
+    "niche": [
+      "Красота и здоровье"
+    ],
+    "followers": 541,
+    "platform": "Инстаграм",
+    "contact": "https://www.instagram.com/alesya_metalnikova?igsh=MTZ3NHFhd280bHFpMA==",
+    "profile_url": "https://www.instagram.com/alesya_metalnikova?igsh=MTZ3NHFhd280bHFpMA==",
+    "photo": "https://static.tildacdn.com/stor3031-3333-4838-b562-623266306266/5873a2c581aef43d2b8316ff235b0e06.jpg"
   },
   {
     "name": "sofiaaali",
@@ -634,18 +634,6 @@
     "photo": "https://static.tildacdn.com/stor6339-3539-4538-b537-353534633531/6d8a205b4f62ae3fef31e90bc6a7fe13.jpg"
   },
   {
-    "name": "darsifirsova",
-    "city": "Москва",
-    "niche": [
-      "Мода и стиль"
-    ],
-    "followers": 97500,
-    "platform": "Инстаграм",
-    "contact": "https://www.instagram.com/darsifirsova?igsh=MWRjbWR1ZmZoanNuNQ==",
-    "profile_url": "https://www.instagram.com/darsifirsova?igsh=MWRjbWR1ZmZoanNuNQ==",
-    "photo": "https://static.tildacdn.com/stor3563-3638-4235-a135-356237373137/85a688dac653af2e7566c037ec236e12.jpg"
-  },
-  {
     "name": "yanaxuyana",
     "city": "Рязань",
     "niche": [
@@ -657,6 +645,18 @@
     "contact": "https://www.instagram.com/yanaxuyana?igsh=N3kza29jaml4NG1p",
     "profile_url": "https://www.instagram.com/yanaxuyana?igsh=N3kza29jaml4NG1p",
     "photo": "https://static.tildacdn.com/stor6335-3634-4032-a637-333038313863/c12c63245b0be00a3466c68ec7650447.jpg"
+  },
+  {
+    "name": "darsifirsova",
+    "city": "Москва",
+    "niche": [
+      "Мода и стиль"
+    ],
+    "followers": 97500,
+    "platform": "Инстаграм",
+    "contact": "https://www.instagram.com/darsifirsova?igsh=MWRjbWR1ZmZoanNuNQ==",
+    "profile_url": "https://www.instagram.com/darsifirsova?igsh=MWRjbWR1ZmZoanNuNQ==",
+    "photo": "https://static.tildacdn.com/stor3563-3638-4235-a135-356237373137/85a688dac653af2e7566c037ec236e12.jpg"
   },
   {
     "name": "yanadlx",
@@ -930,19 +930,6 @@
     "photo": "https://static.tildacdn.com/stor3631-6564-4266-a135-333436646236/e5ce4379f70b82f08a7520dc5d316047.jpg"
   },
   {
-    "name": "lera.brook",
-    "city": "Москва",
-    "niche": [
-      "Технологии и гаджеты",
-      "Образование и развитие"
-    ],
-    "followers": 103,
-    "platform": "Инстаграм",
-    "contact": "https://www.instagram.com/lera.brook?igsh=MXQxYWQxMHY1M3BubA==",
-    "profile_url": "https://www.instagram.com/lera.brook?igsh=MXQxYWQxMHY1M3BubA==",
-    "photo": "https://static.tildacdn.com/stor6362-3634-4236-b430-646364663839/d7d8223b32ed96c7f7dc34fdcca2be67.jpg"
-  },
-  {
     "name": "sssanfirova",
     "city": "Рязань",
     "niche": [
@@ -954,6 +941,19 @@
     "contact": "https://www.instagram.com/sssanfirova?igsh=ZXNpNGw1MHkzd3pu",
     "profile_url": "https://www.instagram.com/sssanfirova?igsh=ZXNpNGw1MHkzd3pu",
     "photo": "https://static.tildacdn.com/stor6634-6135-4563-a665-613161643865/b78cbf1037d0080043475854335f3d51.jpg"
+  },
+  {
+    "name": "lera.brook",
+    "city": "Москва",
+    "niche": [
+      "Технологии и гаджеты",
+      "Образование и развитие"
+    ],
+    "followers": 103,
+    "platform": "Инстаграм",
+    "contact": "https://www.instagram.com/lera.brook?igsh=MXQxYWQxMHY1M3BubA==",
+    "profile_url": "https://www.instagram.com/lera.brook?igsh=MXQxYWQxMHY1M3BubA==",
+    "photo": "https://static.tildacdn.com/stor6362-3634-4236-b430-646364663839/d7d8223b32ed96c7f7dc34fdcca2be67.jpg"
   },
   {
     "name": "masha.mazurka",
@@ -1035,6 +1035,18 @@
     "photo": "https://static.tildacdn.com/stor6538-6530-4636-a631-303036646136/5e1c2b5b98bd6793fe7fc60fda8a0185.jpg"
   },
   {
+    "name": "denik_denik",
+    "city": "Рязань",
+    "niche": [
+      "Красота и здоровье"
+    ],
+    "followers": 11600,
+    "platform": "Инстаграм",
+    "contact": "https://www.instagram.com/denik_denik?igsh=MWZjM3dkaWZkcjYxMw==",
+    "profile_url": "https://www.instagram.com/denik_denik?igsh=MWZjM3dkaWZkcjYxMw==",
+    "photo": "https://static.tildacdn.com/stor3731-6636-4339-a261-363361383835/f5ad2dcb824a2b05fad19d7c82acd44b.jpg"
+  },
+  {
     "name": "irochkakarpova",
     "city": "Москва",
     "niche": [
@@ -1047,18 +1059,6 @@
     "contact": "https://www.instagram.com/irochkakarpova?igsh=MTlscnl6ZWJlNG81OQ==",
     "profile_url": "https://www.instagram.com/irochkakarpova?igsh=MTlscnl6ZWJlNG81OQ==",
     "photo": "https://static.tildacdn.com/stor3331-6535-4263-b035-363239613162/054c101764f070f497f7da0d95201ebf.jpg"
-  },
-  {
-    "name": "denik_denik",
-    "city": "Рязань",
-    "niche": [
-      "Красота и здоровье"
-    ],
-    "followers": 11600,
-    "platform": "Инстаграм",
-    "contact": "https://www.instagram.com/denik_denik?igsh=MWZjM3dkaWZkcjYxMw==",
-    "profile_url": "https://www.instagram.com/denik_denik?igsh=MWZjM3dkaWZkcjYxMw==",
-    "photo": "https://static.tildacdn.com/stor3731-6636-4339-a261-363361383835/f5ad2dcb824a2b05fad19d7c82acd44b.jpg"
   },
   {
     "name": "lisa_bazilevskaja",
@@ -1074,6 +1074,18 @@
     "photo": "https://static.tildacdn.com/stor3038-3361-4030-b966-623335313135/225177685c22e5d6e55f54c9f767d275.jpg"
   },
   {
+    "name": "kristina_mazepa",
+    "city": "Рязань",
+    "niche": [
+      "Красота и здоровье"
+    ],
+    "followers": 3387,
+    "platform": "Инстаграм",
+    "contact": "https://www.instagram.com/kristina_mazepa?igsh=MXFkajM5dW5mOHU0NQ==",
+    "profile_url": "https://www.instagram.com/kristina_mazepa?igsh=MXFkajM5dW5mOHU0NQ==",
+    "photo": "https://static.tildacdn.com/stor3932-6166-4335-a536-303264326666/df1459fe1547620d129e2c70ca8d9cb8.jpg"
+  },
+  {
     "name": "mary.mafin",
     "city": "Москва",
     "niche": [
@@ -1086,18 +1098,6 @@
     "contact": "https://www.instagram.com/mary.mafin?igsh=MWJ3MTc1cHRhNHM3ag==",
     "profile_url": "https://www.instagram.com/mary.mafin?igsh=MWJ3MTc1cHRhNHM3ag==",
     "photo": "https://static.tildacdn.com/stor3333-3464-4236-b938-626539636634/426403d1848f976e3080e747c515bcf8.jpg"
-  },
-  {
-    "name": "kristina_mazepa",
-    "city": "Рязань",
-    "niche": [
-      "Красота и здоровье"
-    ],
-    "followers": 3387,
-    "platform": "Инстаграм",
-    "contact": "https://www.instagram.com/kristina_mazepa?igsh=MXFkajM5dW5mOHU0NQ==",
-    "profile_url": "https://www.instagram.com/kristina_mazepa?igsh=MXFkajM5dW5mOHU0NQ==",
-    "photo": "https://static.tildacdn.com/stor3932-6166-4335-a536-303264326666/df1459fe1547620d129e2c70ca8d9cb8.jpg"
   },
   {
     "name": "alicesamsonova",
@@ -1376,18 +1376,6 @@
     "photo": "https://static.tildacdn.com/stor3465-6563-4535-b537-303330636562/6a4b9b43496851c6989fcc480109479a.jpg"
   },
   {
-    "name": "farhieva.nails",
-    "city": "Рязань",
-    "niche": [
-      "Красота и здоровье"
-    ],
-    "followers": 72,
-    "platform": "Инстаграм",
-    "contact": "https://www.instagram.com/farhieva.nails?igsh=cW4zamJjaHd0aTM2",
-    "profile_url": "https://www.instagram.com/farhieva.nails?igsh=cW4zamJjaHd0aTM2",
-    "photo": "https://static.tildacdn.com/stor3734-3330-4666-b762-336361336362/388aedbbf0a58095ae020dd04342848a.jpg"
-  },
-  {
     "name": "likee.yanusik",
     "city": "Москва",
     "niche": [
@@ -1400,6 +1388,18 @@
     "contact": "https://www.instagram.com/likee.yanusik?igsh=ZGc0eTg2aDM4a3Zw",
     "profile_url": "https://www.instagram.com/likee.yanusik?igsh=ZGc0eTg2aDM4a3Zw",
     "photo": "https://static.tildacdn.com/stor3930-3664-4761-b632-666334336230/e4dbe32012fe438ead72af087617a76d.jpg"
+  },
+  {
+    "name": "farhieva.nails",
+    "city": "Рязань",
+    "niche": [
+      "Красота и здоровье"
+    ],
+    "followers": 72,
+    "platform": "Инстаграм",
+    "contact": "https://www.instagram.com/farhieva.nails?igsh=cW4zamJjaHd0aTM2",
+    "profile_url": "https://www.instagram.com/farhieva.nails?igsh=cW4zamJjaHd0aTM2",
+    "photo": "https://static.tildacdn.com/stor3734-3330-4666-b762-336361336362/388aedbbf0a58095ae020dd04342848a.jpg"
   },
   {
     "name": "appolinaryi",
@@ -1935,19 +1935,6 @@
     "photo": "https://static.tildacdn.com/stor3234-6161-4439-a665-613437343331/5aa7c97ad79fc4a9674e84195df70d4e.jpg"
   },
   {
-    "name": "katu_ressa",
-    "city": "Москва",
-    "niche": [
-      "Питомцы и зоотовары",
-      "Образование и развитие"
-    ],
-    "followers": 230,
-    "platform": "Инстаграм",
-    "contact": "https://www.instagram.com/katu_ressa?igsh=MXdqeTl0cnhqaThncQ==",
-    "profile_url": "https://www.instagram.com/katu_ressa?igsh=MXdqeTl0cnhqaThncQ==",
-    "photo": "https://static.tildacdn.com/stor6437-6132-4962-a433-356331636462/e9b87fc00fde50936115911166436f7a.jpg"
-  },
-  {
     "name": "zolotareva.anny",
     "city": "Рязань",
     "niche": [
@@ -1960,6 +1947,19 @@
     "contact": "https://www.instagram.com/zolotareva.anny?igsh=MXFlejdxYTc4ZmhxcQ==",
     "profile_url": "https://www.instagram.com/zolotareva.anny?igsh=MXFlejdxYTc4ZmhxcQ==",
     "photo": "https://static.tildacdn.com/stor6334-3036-4936-a637-623433613062/976a4d4abca0b8187b9a9c1e7584f154.jpg"
+  },
+  {
+    "name": "katu_ressa",
+    "city": "Москва",
+    "niche": [
+      "Питомцы и зоотовары",
+      "Образование и развитие"
+    ],
+    "followers": 230,
+    "platform": "Инстаграм",
+    "contact": "https://www.instagram.com/katu_ressa?igsh=MXdqeTl0cnhqaThncQ==",
+    "profile_url": "https://www.instagram.com/katu_ressa?igsh=MXdqeTl0cnhqaThncQ==",
+    "photo": "https://static.tildacdn.com/stor6437-6132-4962-a433-356331636462/e9b87fc00fde50936115911166436f7a.jpg"
   },
   {
     "name": "anna_bullschool",
@@ -1975,19 +1975,6 @@
     "photo": "https://static.tildacdn.com/stor6363-3235-4436-a366-363030653237/5a51a76004d56c6552111546d58da157.jpg"
   },
   {
-    "name": "kus_lampasova",
-    "city": "Москва",
-    "niche": [
-      "Питомцы и зоотовары",
-      "Образование и развитие"
-    ],
-    "followers": 20300,
-    "platform": "Инстаграм",
-    "contact": "https://www.instagram.com/ksu_lampasova?igsh=MWdheHEyZHUyeDN1eQ==",
-    "profile_url": "https://www.instagram.com/ksu_lampasova?igsh=MWdheHEyZHUyeDN1eQ==",
-    "photo": "https://static.tildacdn.com/stor3762-3630-4430-a539-336232373531/fba2b1191615bfc637c91620b5a388b1.jpg"
-  },
-  {
     "name": "zdryusha",
     "city": "Рязань",
     "niche": [
@@ -1999,6 +1986,19 @@
     "contact": "https://www.instagram.com/zdryusha?igsh=N2tpZzE4Zm5rYnVp",
     "profile_url": "https://www.instagram.com/zdryusha?igsh=N2tpZzE4Zm5rYnVp",
     "photo": "https://static.tildacdn.com/stor6337-3436-4163-b935-316162313465/ab5e26d1c121b99ece8db671720a1891.jpg"
+  },
+  {
+    "name": "kus_lampasova",
+    "city": "Москва",
+    "niche": [
+      "Питомцы и зоотовары",
+      "Образование и развитие"
+    ],
+    "followers": 20300,
+    "platform": "Инстаграм",
+    "contact": "https://www.instagram.com/ksu_lampasova?igsh=MWdheHEyZHUyeDN1eQ==",
+    "profile_url": "https://www.instagram.com/ksu_lampasova?igsh=MWdheHEyZHUyeDN1eQ==",
+    "photo": "https://static.tildacdn.com/stor3762-3630-4430-a539-336232373531/fba2b1191615bfc637c91620b5a388b1.jpg"
   },
   {
     "name": "sleepy.purppies_",
@@ -2319,6 +2319,19 @@
     "photo": "https://static.tildacdn.com/stor3536-3834-4364-a539-386164323739/af8187e120c2f671f30f1a75ac951237.jpg"
   },
   {
+    "name": "Рязанский гуляка",
+    "city": "Рязань",
+    "niche": [
+      "Еда и напитки",
+      "Ивенты и развлечения"
+    ],
+    "followers": 11836,
+    "platform": "Телеграм",
+    "contact": "https://t.me/gulyaka62",
+    "profile_url": "https://t.me/gulyaka62",
+    "photo": "https://static.tildacdn.com/stor6663-6165-4162-b462-303664613762/75822763.jpg"
+  },
+  {
     "name": "bulaavina",
     "city": "Москва",
     "niche": [
@@ -2331,19 +2344,6 @@
     "contact": "https://www.instagram.com/bulaavina?igsh=dTU2cHd2NmpsdXFy",
     "profile_url": "https://www.instagram.com/bulaavina?igsh=dTU2cHd2NmpsdXFy",
     "photo": "https://static.tildacdn.com/stor3838-6665-4330-a530-303530646661/18b450ccafb0e307073790235721a1f3.jpg"
-  },
-  {
-    "name": "Рязанский гуляка",
-    "city": "Рязань",
-    "niche": [
-      "Еда и напитки",
-      "Ивенты и развлечения"
-    ],
-    "followers": 11836,
-    "platform": "Телеграм",
-    "contact": "https://t.me/gulyaka62",
-    "profile_url": "https://t.me/gulyaka62",
-    "photo": "https://static.tildacdn.com/stor6663-6165-4162-b462-303664613762/75822763.jpg"
   },
   {
     "name": "by.annmari",
@@ -2443,20 +2443,6 @@
     "photo": "https://static.tildacdn.com/stor6636-3733-4133-b439-663039613230/3cc069a3d666b850f30ef135af4eb067.jpg"
   },
   {
-    "name": "oh__mari",
-    "city": "Москва",
-    "niche": [
-      "Дети и родители",
-      "Мода и стиль",
-      "Красота и здоровье"
-    ],
-    "followers": 304,
-    "platform": "Инстаграм",
-    "contact": "https://www.instagram.com/oh__mari?igsh=MTZxM2J5aThhOGgzbA==",
-    "profile_url": "https://www.instagram.com/oh__mari?igsh=MTZxM2J5aThhOGgzbA==",
-    "photo": "https://static.tildacdn.com/stor6630-6337-4233-a266-646361363735/200310215106a44b8f1844e3a9804ad8.jpg"
-  },
-  {
     "name": "Kotochat🔮",
     "city": "Рязань",
     "niche": [
@@ -2470,6 +2456,20 @@
     "contact": "https://t.me/kotochat23",
     "profile_url": "https://t.me/kotochat23",
     "photo": "https://static.tildacdn.com/stor3336-3736-4265-b539-353765366133/92565477.jpg"
+  },
+  {
+    "name": "oh__mari",
+    "city": "Москва",
+    "niche": [
+      "Дети и родители",
+      "Мода и стиль",
+      "Красота и здоровье"
+    ],
+    "followers": 304,
+    "platform": "Инстаграм",
+    "contact": "https://www.instagram.com/oh__mari?igsh=MTZxM2J5aThhOGgzbA==",
+    "profile_url": "https://www.instagram.com/oh__mari?igsh=MTZxM2J5aThhOGgzbA==",
+    "photo": "https://static.tildacdn.com/stor6630-6337-4233-a266-646361363735/200310215106a44b8f1844e3a9804ad8.jpg"
   },
   {
     "name": "borisova_lifeinstyle",
@@ -2736,19 +2736,6 @@
     "photo": "https://static.tildacdn.com/stor6236-3132-4337-b130-316563656233/e50a3b33d15590a33471b5906de88c50.jpg"
   },
   {
-    "name": "yyaankeee",
-    "city": "Москва",
-    "niche": [
-      "Красота и здоровье",
-      "Мода и стиль"
-    ],
-    "followers": 12700,
-    "platform": "Инстаграм",
-    "contact": "https://www.instagram.com/yyaankeee?igsh=MTJwdXBheGZ6NHNiMQ==",
-    "profile_url": "https://www.instagram.com/yyaankeee?igsh=MTJwdXBheGZ6NHNiMQ==",
-    "photo": "https://static.tildacdn.com/stor3239-6365-4965-b263-346164616638/081a6a8d0ac1fbc4405bcdee88dce3aa.jpg"
-  },
-  {
     "name": "Бил вещает",
     "city": "Рязань",
     "niche": [
@@ -2761,6 +2748,19 @@
     "contact": "https://t.me/+Ein0MseJdU02YTcy?fbclid=PAZnRzaANNyW5leHRuA2FlbQIxMQABp6DgPuIihvIiMDGpNKa4HNhWVYI5MqhgdsFgYnYGOfT5akstLGdY7tJl1DE5_aem_PZOSM1RQ_mskQEmsivz7gw",
     "profile_url": "https://t.me/+Ein0MseJdU02YTcy?fbclid=PAZnRzaANNyW5leHRuA2FlbQIxMQABp6DgPuIihvIiMDGpNKa4HNhWVYI5MqhgdsFgYnYGOfT5akstLGdY7tJl1DE5_aem_PZOSM1RQ_mskQEmsivz7gw",
     "photo": "https://static.tildacdn.com/stor3838-3535-4636-a166-643430326338/56294259.jpg"
+  },
+  {
+    "name": "yyaankeee",
+    "city": "Москва",
+    "niche": [
+      "Красота и здоровье",
+      "Мода и стиль"
+    ],
+    "followers": 12700,
+    "platform": "Инстаграм",
+    "contact": "https://www.instagram.com/yyaankeee?igsh=MTJwdXBheGZ6NHNiMQ==",
+    "profile_url": "https://www.instagram.com/yyaankeee?igsh=MTJwdXBheGZ6NHNiMQ==",
+    "photo": "https://static.tildacdn.com/stor3239-6365-4965-b263-346164616638/081a6a8d0ac1fbc4405bcdee88dce3aa.jpg"
   },
   {
     "name": "veronikakuznetsovamodel",
@@ -2776,20 +2776,6 @@
     "photo": "https://static.tildacdn.com/stor6337-6564-4437-b237-663930356561/900c60977890dc5ce1820e047ad53b9a.jpg"
   },
   {
-    "name": "spisladkkko",
-    "city": "Москва",
-    "niche": [
-      "Красота и здоровье",
-      "Дом и интерьер",
-      "Образование и развитие"
-    ],
-    "followers": 425,
-    "platform": "Инстаграм",
-    "contact": "https://www.instagram.com/spisladkkko?igsh=Y3EwZ3IzdGx1MXZl",
-    "profile_url": "https://www.instagram.com/spisladkkko?igsh=Y3EwZ3IzdGx1MXZl",
-    "photo": "https://static.tildacdn.com/stor3239-3835-4133-b765-353736663164/527dc21e1afa3079c50bc07acd7da76f.jpg"
-  },
-  {
     "name": "vaypas",
     "city": "Рязань",
     "niche": [
@@ -2802,6 +2788,20 @@
     "contact": "https://t.me/ohhlilya",
     "profile_url": "https://t.me/ohhlilya",
     "photo": "https://static.tildacdn.com/stor3634-6335-4432-a164-623366366464/77346896.jpg"
+  },
+  {
+    "name": "spisladkkko",
+    "city": "Москва",
+    "niche": [
+      "Красота и здоровье",
+      "Дом и интерьер",
+      "Образование и развитие"
+    ],
+    "followers": 425,
+    "platform": "Инстаграм",
+    "contact": "https://www.instagram.com/spisladkkko?igsh=Y3EwZ3IzdGx1MXZl",
+    "profile_url": "https://www.instagram.com/spisladkkko?igsh=Y3EwZ3IzdGx1MXZl",
+    "photo": "https://static.tildacdn.com/stor3239-3835-4133-b765-353736663164/527dc21e1afa3079c50bc07acd7da76f.jpg"
   },
   {
     "name": "kosmanast",
@@ -2831,6 +2831,18 @@
     "photo": "https://static.tildacdn.com/stor6231-3564-4662-a630-666633376135/54bb1b170d6f960818bcf609fbd29b3a.jpg"
   },
   {
+    "name": "Приём - приём.. Гроза на связи",
+    "city": "Рязань",
+    "niche": [
+      "Ивенты и развлечения"
+    ],
+    "followers": 3382,
+    "platform": "Телеграм",
+    "contact": "https://t.me/groza_raiona_tg",
+    "profile_url": "https://t.me/groza_raiona_tg",
+    "photo": "https://static.tildacdn.com/stor3937-3534-4564-b331-333533636337/64130478.jpg"
+  },
+  {
     "name": "a.rishkin",
     "city": "Москва",
     "niche": [
@@ -2843,18 +2855,6 @@
     "contact": "https://www.instagram.com/a.rishkin?igsh=MmF0cm4ydGFzOTAx",
     "profile_url": "https://www.instagram.com/a.rishkin?igsh=MmF0cm4ydGFzOTAx",
     "photo": "https://static.tildacdn.com/stor6334-6166-4230-a638-306530646139/efa89ed93e43f873bab7a026b2a59300.jpg"
-  },
-  {
-    "name": "Приём - приём.. Гроза на связи",
-    "city": "Рязань",
-    "niche": [
-      "Ивенты и развлечения"
-    ],
-    "followers": 3382,
-    "platform": "Телеграм",
-    "contact": "https://t.me/groza_raiona_tg",
-    "profile_url": "https://t.me/groza_raiona_tg",
-    "photo": "https://static.tildacdn.com/stor3937-3534-4564-b331-333533636337/64130478.jpg"
   },
   {
     "name": "os.tanii",
@@ -3158,18 +3158,6 @@
     "photo": "https://static.tildacdn.com/stor3931-3937-4634-b533-326466643335/9eeb85749952ee4304aa0bb7e040a5ac.jpg"
   },
   {
-    "name": "ss.dayanaa",
-    "city": "Бишкек",
-    "niche": [
-      "Красота и здоровье"
-    ],
-    "followers": 540,
-    "platform": "Инстаграм",
-    "contact": "https://www.instagram.com/ss.dayanaa?igsh=MTZzM3Yyb3drMnhhbg==",
-    "profile_url": "https://www.instagram.com/ss.dayanaa?igsh=MTZzM3Yyb3drMnhhbg==",
-    "photo": "https://static.tildacdn.com/stor6264-6433-4432-b661-313331333033/a8a31e27eea5ae7eb8338d91d51670b2.jpg"
-  },
-  {
     "name": "По душам ❤️‍🩹",
     "city": "Рязань",
     "niche": [
@@ -3180,6 +3168,18 @@
     "contact": "https://t.me/podusham_ceramic",
     "profile_url": "https://t.me/podusham_ceramic",
     "photo": "https://static.tildacdn.com/stor6564-3962-4762-b766-363764336465/28177736.jpg"
+  },
+  {
+    "name": "ss.dayanaa",
+    "city": "Бишкек",
+    "niche": [
+      "Красота и здоровье"
+    ],
+    "followers": 540,
+    "platform": "Инстаграм",
+    "contact": "https://www.instagram.com/ss.dayanaa?igsh=MTZzM3Yyb3drMnhhbg==",
+    "profile_url": "https://www.instagram.com/ss.dayanaa?igsh=MTZzM3Yyb3drMnhhbg==",
+    "photo": "https://static.tildacdn.com/stor6264-6433-4432-b661-313331333033/a8a31e27eea5ae7eb8338d91d51670b2.jpg"
   },
   {
     "name": "vika_smolya",
@@ -3890,20 +3890,6 @@
     "photo": "https://static.tildacdn.com/stor6434-3562-4166-a135-323561353534/975b8c6a6cb09350621e2ca3e8bedae4.jpg"
   },
   {
-    "name": "vikulisheva",
-    "city": "Москва",
-    "niche": [
-      "Образование и развитие",
-      "Еда и напитки",
-      "Дом и интерьер"
-    ],
-    "followers": 189,
-    "platform": "Инстаграм",
-    "contact": "https://www.instagram.com/vikulisheva?igsh=OWZwOG9odWdob2Z4",
-    "profile_url": "https://www.instagram.com/vikulisheva?igsh=OWZwOG9odWdob2Z4",
-    "photo": "https://static.tildacdn.com/stor6538-6433-4539-a532-393038323964/90cec33ea20695aa8d0aea1c1f540723.jpg"
-  },
-  {
     "name": "Валерия Чиркова • Натуральные брови • Рязань",
     "city": "Рязань",
     "niche": [
@@ -3916,6 +3902,20 @@
     "contact": "https://t.me/valeriachirkovaa",
     "profile_url": "https://t.me/valeriachirkovaa",
     "photo": "https://static.tildacdn.com/stor3264-6564-4963-b066-636532633731/32470561.jpg"
+  },
+  {
+    "name": "vikulisheva",
+    "city": "Москва",
+    "niche": [
+      "Образование и развитие",
+      "Еда и напитки",
+      "Дом и интерьер"
+    ],
+    "followers": 189,
+    "platform": "Инстаграм",
+    "contact": "https://www.instagram.com/vikulisheva?igsh=OWZwOG9odWdob2Z4",
+    "profile_url": "https://www.instagram.com/vikulisheva?igsh=OWZwOG9odWdob2Z4",
+    "photo": "https://static.tildacdn.com/stor6538-6433-4539-a532-393038323964/90cec33ea20695aa8d0aea1c1f540723.jpg"
   },
   {
     "name": "juiuulbo",

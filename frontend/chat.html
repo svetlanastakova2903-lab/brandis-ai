@@ -100,7 +100,7 @@
 
     <div id="auth-gate">
       <h1>Войди через Telegram, чтобы начать</h1>
-      <p>Так мы сохраним историю подбора между визитами и сможем применить лимиты бесплатного доступа и подписки.</p>
+      <p>Так мы сохраним историю подбора между визитами и сможем применить лимит бесплатного доступа и купленные пакеты подборов.</p>
       <a id="tg-link" class="tg-button" href="#" target="_blank" rel="noopener">
         Войти через Telegram →
       </a>
@@ -181,31 +181,33 @@
     const actions = document.createElement("div");
     actions.className = "paywall-actions";
 
-    if (cta === "subscribe") {
-      const btn = document.createElement("button");
-      btn.className = "paywall-btn primary";
-      btn.textContent = "Оформить подписку — 999₽/мес";
-      btn.onclick = () => startPayment("/api/billing/subscribe");
-      actions.appendChild(btn);
-    }
-    if (cta === "addon") {
-      const btn = document.createElement("button");
-      btn.className = "paywall-btn primary";
-      btn.textContent = "Докупить +20 поисков — 299₽";
-      btn.onclick = () => startPayment("/api/billing/addon");
-      actions.appendChild(btn);
-    }
+    if (cta === "pack") addPackButtons(actions);
     div.appendChild(actions);
     messagesEl.appendChild(div);
     messagesEl.scrollTop = messagesEl.scrollHeight;
   }
 
-  async function startPayment(endpoint){
+  function addPackButtons(actions){
+    [
+      { id: "s", label: "3 подбора — 390₽" },
+      { id: "m", label: "10 подборов — 990₽" },
+      { id: "l", label: "30 подборов — 2790₽" },
+    ].forEach((pack) => {
+      const btn = document.createElement("button");
+      btn.className = "paywall-btn primary";
+      btn.textContent = pack.label;
+      btn.onclick = () => startPackPayment(pack.id);
+      actions.appendChild(btn);
+    });
+  }
+
+  async function startPackPayment(pack){
     try {
-      const res = await fetch(API_BASE + endpoint, {
+      const res = await fetch(API_BASE + "/api/billing/pack", {
         method: "POST",
-                headers: authHeaders(),
-        });
+        headers: { ...authHeaders(), "Content-Type": "application/json" },
+        body: JSON.stringify({ pack, from: "ai" }),
+      });
       const data = await res.json();
       if (data.confirmation_url) {
         window.location.href = data.confirmation_url;
@@ -222,7 +224,9 @@
     let text;
     if (billing.subscriptionStatus === "active") {
       const left = Math.max(billing.subscriptionIncludedSearches - billing.searchesUsedThisPeriod, 0);
-      text = left > 0 ? `Осталось ${left}/${billing.subscriptionIncludedSearches} в этом периоде` : `+${billing.addonSearchesRemaining} докуплено`;
+      text = left > 0 ? `Осталось ${left}/${billing.subscriptionIncludedSearches} в этом периоде` : `Осталось ${billing.addonSearchesRemaining} купленных подборов`;
+    } else if (billing.addonSearchesRemaining > 0) {
+      text = `Осталось ${billing.addonSearchesRemaining} купленных подборов`;
 } else {
       text = billing.freeSearchUsed ? "Бесплатный поиск использован" : "1 бесплатный поиск доступен";
 }

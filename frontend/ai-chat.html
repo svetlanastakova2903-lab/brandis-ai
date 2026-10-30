@@ -201,10 +201,10 @@
 
       <div id="authgate">
         <h1>Войди через Telegram,<br>чтобы начать подбор</h1>
-        <p>Так мы сохраним историю между визитами и сможем дать тебе 1 бесплатный подбор, а дальше — по подписке.</p>
+        <p>Так мы сохраним историю между визитами и сможем дать тебе 1 бесплатный подбор, а дальше — купить пакет подборов.</p>
         <a id="tg-link" class="tg-btn" href="#" target="_blank" rel="noopener">Войти через Telegram →</a>
         <div id="authwait"><span class="spinner"></span> Ждём подтверждения в Telegram…</div>
-        <div id="authnote">Первый подбор — бесплатно. Дальше — подписка 999₽/мес на 50 подборов или разовый пакет +20 за 299₽.</div>
+        <div id="authnote">Первый подбор — бесплатно. Дальше — разовые пакеты: 3 за 390₽, 10 за 990₽ или 30 за 2790₽. Купленные подборы не сгорают.</div>
       </div>
 
       <div id="chatapp">
@@ -444,20 +444,7 @@
     box.appendChild(p);
     const actions = document.createElement("div");
     actions.className = "paywall-actions";
-    if (cta === "subscribe"){
-      const btn = document.createElement("button");
-      btn.className = "paywall-btn primary";
-      btn.textContent = "Оформить подписку";
-      btn.onclick = () => startPayment("/api/billing/subscribe");
-      actions.appendChild(btn);
-    }
-    if (cta === "addon"){
-      const btn = document.createElement("button");
-      btn.className = "paywall-btn primary";
-      btn.textContent = "Докупить поиски";
-      btn.onclick = () => startPayment("/api/billing/addon");
-      actions.appendChild(btn);
-    }
+    if (cta === "pack") addPackButtons(actions);
     box.appendChild(actions);
     row.innerHTML = '<div class="rowlabel">AI BRANDIS</div>';
     row.appendChild(box);
@@ -465,9 +452,27 @@
     scrollDown();
   }
 
-  async function startPayment(endpoint){
+  function addPackButtons(actions){
+    [
+      { id: "s", label: "3 подбора · 390₽" },
+      { id: "m", label: "10 подборов · 990₽" },
+      { id: "l", label: "30 подборов · 2790₽" },
+    ].forEach((pack) => {
+      const btn = document.createElement("button");
+      btn.className = "paywall-btn primary";
+      btn.textContent = pack.label;
+      btn.onclick = () => startPackPayment(pack.id);
+      actions.appendChild(btn);
+    });
+  }
+
+  async function startPackPayment(pack){
     try {
-      const res = await fetch(API_BASE + endpoint, { method: "POST", headers: authHeaders() });
+      const res = await fetch(API_BASE + "/api/billing/pack", {
+        method: "POST",
+        headers: { ...authHeaders(), "Content-Type": "application/json" },
+        body: JSON.stringify({ pack, from: "ai" }),
+      });
       const data = await res.json();
       if (data.confirmation_url) window.location.href = data.confirmation_url;
       else addMessage("bot", "Не получилось создать платёж. Попробуй ещё раз чуть позже.");
@@ -481,7 +486,9 @@
     let text;
     if (billing.subscriptionStatus === "active"){
       const left = Math.max(billing.subscriptionIncludedSearches - billing.searchesUsedThisPeriod, 0);
-      text = left > 0 ? "осталось " + left + "/" + billing.subscriptionIncludedSearches + " в этом периоде" : "+" + billing.addonSearchesRemaining + " докуплено";
+      text = left > 0 ? "осталось " + left + "/" + billing.subscriptionIncludedSearches + " в этом периоде" : "осталось " + billing.addonSearchesRemaining + " купленных подборов";
+    } else if (billing.addonSearchesRemaining > 0) {
+      text = "осталось " + billing.addonSearchesRemaining + " купленных подборов";
     } else {
       text = billing.freeSearchUsed ? "бесплатный подбор использован" : "1 бесплатный подбор доступен";
     }

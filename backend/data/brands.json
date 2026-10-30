@@ -17108,5 +17108,32 @@
       "Образование и развитие"
     ],
     "contact": "https://t.me/oliivka"
+  },
+  {
+    "name": "Алексей Рогачев — фитнес-тренер",
+    "city": "Клинцы",
+    "niche": [
+      "Красота и здоровье"
+    ],
+    "contact": "https://www.instagram.com/oneosmy"
+  },
+  {
+    "name": "Sofrino Park",
+    "city": "Московская область",
+    "niche": [
+      "Путешествия и отдых",
+      "Ивенты и развлечения",
+      "Дети и родители"
+    ],
+    "contact": "https://sofrino-park.com/"
+  },
+  {
+    "name": "АрсЛея премиум",
+    "city": null,
+    "niche": [
+      "Мода и стиль",
+      "Подарки и праздники"
+    ],
+    "contact": "https://max.ru/id774361036119_biz"
   }
 ]

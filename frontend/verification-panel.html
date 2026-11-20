@@ -1,0 +1,118 @@
+<!-- Встраивать в /me на том же origin после существующего входа Telegram.
+     До включения серверных флагов оплата недоступна. -->
+<section id="brandis-verification" aria-labelledby="bv-title">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Archivo:wght@700;800;900&family=JetBrains+Mono:wght@400;500&display=swap');
+    html:has(body > #brandis-verification){background:#0c0b09}
+    body:has(> #brandis-verification){margin:0;background:#0c0b09}
+    #brandis-verification{box-sizing:border-box;font:14px/1.75 "JetBrains Mono",monospace;color:#f2ede4;background:#0c0b09;padding:56px 32px;max-width:960px;margin:0 auto}
+    #brandis-verification *{box-sizing:border-box}
+    #brandis-verification .eyebrow{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#918b82;margin:0 0 28px}
+    #brandis-verification h2{font-family:Archivo,Arial,sans-serif;font-size:clamp(32px,6vw,54px);font-weight:900;line-height:1.1;letter-spacing:-1px;text-transform:uppercase;margin:0 0 24px}
+    #brandis-verification h2 span{color:#ff6a2c}
+    #brandis-verification h3{font:700 20px/1.4 Archivo,Arial,sans-serif}
+    #brandis-verification p{color:#aaa398;max-width:720px}
+    #brandis-verification .intro{font-size:16px;margin-bottom:32px}
+    #brandis-verification ol{list-style:none;padding:0;margin:32px 0;display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid #37332e;border-bottom:1px solid #37332e;counter-reset:steps}
+    #brandis-verification li{counter-increment:steps;padding:24px 20px;border-right:1px solid #37332e}
+    #brandis-verification li:first-child{padding-left:0}#brandis-verification li:last-child{border-right:0}
+    #brandis-verification li::before{content:"0" counter(steps);display:block;color:#ff6a2c;font-size:11px;margin-bottom:12px}
+    #brandis-verification li strong{display:block;font:700 18px/1.4 Archivo,Arial,sans-serif;margin-bottom:8px}
+    #brandis-verification li span{color:#aaa398;font-size:12px;line-height:1.7;display:block}
+    #brandis-verification .terms{font-size:12px;margin-bottom:32px}
+    #brandis-verification form{border-top:1px solid #37332e;padding-top:16px}
+    #brandis-verification label{display:block;margin:20px 0;font-size:12px}
+    #brandis-verification input[type=url]{display:block;width:100%;padding:16px;margin-top:10px;border:1px solid #575149;border-radius:0;color:#f2ede4;background:#14120f;font:14px/1.5 "JetBrains Mono",monospace}
+    #brandis-verification input::placeholder{color:#827b72}#brandis-verification input[type=checkbox]{accent-color:#ff6a2c;width:17px;height:17px;vertical-align:middle;margin-right:8px}
+    #brandis-verification button{font:500 12px/1.5 "JetBrains Mono",monospace;letter-spacing:1px;padding:16px 24px;border:1px solid #ff6a2c;border-radius:0;background:#ff6a2c;color:#0c0b09;cursor:pointer;margin:8px 12px 8px 0}
+    #brandis-verification button:hover{background:#f2ede4;border-color:#f2ede4}
+    #brandis-verification button:disabled{opacity:.5;cursor:default}#brandis-verification :focus-visible{outline:2px solid #ff6a2c;outline-offset:4px}
+    #brandis-verification article{border-top:1px solid #37332e;margin-top:24px;padding-top:20px;overflow-wrap:anywhere}
+    #brandis-verification code{display:block;background:#17130f;border:1px solid #575149;padding:18px;overflow-wrap:anywhere;color:#ff6a2c;font:inherit}
+    #brandis-verification #bv-refresh{background:transparent;border-color:#575149;color:#aaa398}
+    #brandis-verification #bv-refresh:hover{color:#ff6a2c;border-color:#ff6a2c}
+    #bv-status{white-space:pre-wrap;font-size:12px}#bv-status:empty{display:none}
+    @media(max-width:600px){#brandis-verification{padding:32px 20px}#brandis-verification ol{grid-template-columns:1fr}#brandis-verification li,#brandis-verification li:first-child{padding:20px 0;border-right:0;border-bottom:1px solid #37332e}#brandis-verification li:last-child{border-bottom:0}#brandis-verification button{width:100%;margin-right:0}}
+  </style>
+  <p class="eyebrow">// личный кабинет · моя анкета</p>
+  <h2 id="bv-title">Ваша анкета.<br><span>Ваше имя_</span></h2>
+  <p class="intro">Подтвердите, что профиль принадлежит вам. После проверки у анкеты появится оранжевая звёздочка — знак, что за ней стоит её владелец.</p>
+  <ol>
+    <li><strong>Оплатите проверку</strong><span>500 ₽ один раз. Размещение анкеты остаётся бесплатным.</span></li>
+    <li><strong>Добавьте код</strong><span>Выдадим его после оплаты. Временно разместите код в описании своего профиля.</span></li>
+    <li><strong>Получите звёздочку</strong><span>Нажмите «Проверить профиль». После подтверждения код можно удалить.</span></li>
+  </ol>
+  <p class="terms">Если автоматическая проверка недоступна, проверим вручную за 3–5 рабочих дней после отправки заявки. Если подтвердить владельца не получится — вернём оплату. Повторно платить не нужно.</p>
+  <form id="bv-form">
+    <label>Ссылка на профиль из вашей анкеты<input name="profile_url" type="url" required placeholder="https://t.me/your_profile" maxlength="500"></label>
+    <label><input name="contact_consent" type="checkbox" required> Можно связаться со мной в Telegram по поводу проверки.</label>
+    <button type="submit">продолжить →</button>
+  </form>
+  <p id="bv-status" role="status" aria-live="polite"></p>
+  <div id="bv-claims"></div>
+  <button id="bv-refresh" type="button">обновить статус</button>
+</section>
+<script>
+(()=>{
+  const root=document.getElementById('brandis-verification');
+  const status=root.querySelector('#bv-status');
+  const claims=root.querySelector('#bv-claims');
+  const form=root.querySelector('#bv-form');
+  const review=document.createElement('div');root.append(review);
+  const api=window.BRANDIS_API_URL||'https://brandis-ai.onrender.com';
+  let paymentEnabled=false;
+  async function request(path,body){
+    const token=localStorage.getItem('brandis_access_token');
+    if(!token)throw new Error('Сначала войдите в общий кабинет через Telegram.');
+    const response=await fetch(api+'/api/verification'+path,{method:body?'POST':'GET',headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},...(body?{body:JSON.stringify(body)}:{})});
+    const data=await response.json();
+    if(!response.ok)throw new Error(data.error||'Не удалось выполнить запрос. Попробуйте обновить статус.');
+    return data;
+  }
+  function text(parent,tag,value){const e=document.createElement(tag);e.textContent=value;parent.append(e);return e;}
+  function button(parent,label,action){const b=text(parent,'button',label);b.type='button';b.onclick=async()=>{b.disabled=true;status.textContent='';try{await action();}catch(e){status.textContent=e.message;}finally{b.disabled=false;}};return b;}
+  async function refreshReview(){
+    let data;try{data=await request('/review');}catch{return;}
+    review.replaceChildren();text(review,'h3','Проверка анкет — администратор');
+    for(const claim of data.claims){
+      const card=document.createElement('article');review.append(card);
+      const link=text(card,'a',claim.profile_url);link.href=claim.profile_url;link.target='_blank';link.rel='noopener';
+      text(card,'p','Откройте профиль и сравните код в его описании.');text(card,'code',claim.proof_code);
+      const label=text(card,'label','Комментарий проверки');const note=document.createElement('textarea');label.append(note);note.maxLength=1000;note.style.width='100%';
+      for(const [decision,title] of [['verified','Код совпадает — подтвердить'],['needs_information','Запросить уточнение'],['refund_pending','Передать на возврат']])button(card,title,async()=>{await request('/review/'+claim.id,{decision,note:note.value});await refresh();});
+    }
+  }
+  async function refresh(){
+    const data=await request('/me');paymentEnabled=data.payments_enabled;claims.replaceChildren();text(claims,'p','Ваш Telegram ID: '+data.telegram_id);
+    for(const claim of data.claims){
+      const card=document.createElement('article');claims.append(card);text(card,'h3',claim.profile_url);
+      if(claim.status==='awaiting_payment'){
+        text(card,'p','Шаг 1. Оплатите проверку — 500 ₽. После подтверждения платежа здесь появится ваш код.');
+        const b=button(card,paymentEnabled?'Оплатить 500 ₽':'Оплата пока не открыта',async()=>{
+          const result=await request('/claims/'+claim.id+'/pay',{});
+          if(result.confirmation_url)window.location.assign(result.confirmation_url);else await refresh();
+        });b.disabled=!paymentEnabled;
+      }else if(['awaiting_proof','needs_information'].includes(claim.status)){
+        text(card,'p','Шаг 2. Добавьте этот код в описание указанного выше профиля. Оставьте его до окончания проверки.');
+        text(card,'code',claim.proof_code||'Код пока недоступен — обновите статус.');
+        if(claim.proof_code){button(card,'Скопировать код',async()=>{await navigator.clipboard.writeText(claim.proof_code);status.textContent='Код скопирован.';});
+          button(card,'Проверить профиль',async()=>{const result=await request('/claims/'+claim.id+'/check',{});await refresh();status.textContent=result.message;});}
+      }else if(claim.status==='pending_review')text(card,'p','Проверяем профиль. Сохраните код в описании. Повторно платить не нужно.');
+      else if(claim.status==='verified'){
+        text(card,'h3','✦ Владелец подтверждён');text(card,'p','Код можно удалить из описания профиля. Ваша анкета получает приоритет среди подходящих результатов каталога.');
+        text(card,'p',claim.offers_enabled?'Предложения приходят в ваш Telegram через бот Brandis.':'Включите получение предложений, чтобы у анкеты появилась кнопка «Написать».');
+        button(card,claim.offers_enabled?'Отключить предложения':'Получать предложения в Telegram',async()=>{await request('/claims/'+claim.id+'/notifications',{enabled:!claim.offers_enabled});await refresh();});
+      }
+      else if(claim.status==='refund_pending')text(card,'p','Не удалось подтвердить профиль. Заявка на возврат передана команде.');
+      else if(claim.status==='refunded')text(card,'p','Возврат выполнен.');
+      else text(card,'p','Свяжитесь с поддержкой Brandis для уточнения статуса.');
+    }
+    await refreshReview();
+  }
+  form.onsubmit=async event=>{event.preventDefault();const b=form.querySelector('button');b.disabled=true;try{const data=new FormData(form);await request('/claims',{profile_url:data.get('profile_url'),contact_consent:data.get('contact_consent')==='on'});await refresh();status.textContent='Заявка сохранена.';}catch(e){status.textContent=e.message;}finally{b.disabled=false;}};
+  root.querySelector('#bv-refresh').onclick=()=>refresh().catch(e=>status.textContent=e.message);
+  let lastToken=localStorage.getItem('brandis_access_token');
+  setInterval(()=>{const next=localStorage.getItem('brandis_access_token');if(next!==lastToken){lastToken=next;refresh().catch(e=>status.textContent=e.message);}},2000);
+  refresh().catch(e=>status.textContent=e.message);
+})();
+</script>

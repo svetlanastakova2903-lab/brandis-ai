@@ -201,7 +201,8 @@ export async function getPendingLink(sessionCode) {
 export async function completePendingLink(sessionCode, telegramId) {
   const { rows } = await query(
     `UPDATE pending_links SET telegram_id = $2, linked_at = now()
-     WHERE session_code = $1
+     WHERE session_code = $1 AND linked_at IS NULL
+       AND created_at > now() - INTERVAL '15 minutes'
      RETURNING *`,
     [sessionCode, telegramId]
   );

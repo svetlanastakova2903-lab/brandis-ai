@@ -11,13 +11,13 @@ function authHeader() {
   return "Basic " + Buffer.from(`${shopId}:${secretKey}`).toString("base64");
 }
 
-async function yookassaFetch(path, body) {
+async function yookassaFetch(path, body, idempotenceKey = crypto.randomUUID()) {
   const res = await fetch(`${API_BASE}${path}`, {
     method: "POST",
     headers: {
       Authorization: authHeader(),
       "Content-Type": "application/json",
-      "Idempotence-Key": crypto.randomUUID(),
+      "Idempotence-Key": idempotenceKey,
     },
     body: JSON.stringify(body),
   });
@@ -97,6 +97,15 @@ export async function createPackPayment({ telegramId, pack, returnUrl }) {
  */
 export async function getPayment(paymentId) {
   return yookassaGet(`/payments/${paymentId}`);
+}
+
+export async function createVerificationPayment({claimId, telegramId, returnUrl, idempotenceKey}) {
+  return yookassaFetch('/payments', {
+    amount: {value:'500.00', currency:'RUB'}, capture:true,
+    confirmation:{type:'redirect', return_url:returnUrl},
+    description:'Brandis — проверка владельца анкеты',
+    metadata:{type:'verification', claim_id:claimId, telegram_id:String(telegramId)},
+  }, idempotenceKey);
 }
 
 // Подсети, с которых ЮKassa отправляет вебхуки (см. документацию ЮKassa "Входящие уведомления").

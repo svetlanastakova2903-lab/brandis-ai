@@ -236,11 +236,8 @@
 
   // ---------- Привязка Telegram ----------
   async function startAuth(){
-    let sessionCode = localStorage.getItem("brandis_session_code");
-    if (!sessionCode) {
-      sessionCode = crypto.randomUUID();
-      localStorage.setItem("brandis_session_code", sessionCode);
-}
+    const sessionCode = crypto.randomUUID();
+    localStorage.setItem("brandis_session_code", sessionCode);
     const res = await fetch(API_BASE + "/api/auth/start", {
       method: "POST",
       headers: { "Content-Type": "application/json" },

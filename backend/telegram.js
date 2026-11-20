@@ -1,4 +1,5 @@
 const API_BASE = "https://api.telegram.org";
+import { privateSender, validWebhookSecret, webhookSecret } from './auth-security.js';
 
 function botToken() {
   const token = process.env.TELEGRAM_BOT_TOKEN;
@@ -11,6 +12,7 @@ async function callTelegramApi(method, body) {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body || {}),
+    signal: AbortSignal.timeout(15000),
   });
   const data = await res.json().catch(() => null);
   if (!data?.ok) {
@@ -25,6 +27,15 @@ export async function sendMessage(chatId, text) {
 
 export async function getMe() {
   return callTelegramApi("getMe", {});
+}
+
+export async function getPublicProfileDescription(profileUrl) {
+  const url = new URL(profileUrl);
+  if(url.hostname !== 't.me' || !/^\/[a-z0-9_]{5,32}$/i.test(url.pathname)) return null;
+  const response = await callTelegramApi('getChat',{chat_id:'@'+url.pathname.slice(1)});
+  const chat = response?.result;
+  if(!response?.ok || !chat?.username || chat.username.toLowerCase() !== url.pathname.slice(1).toLowerCase()) return null;
+  return typeof chat.description === 'string' ? chat.description : null;
 }
 
 let cachedBotUsername = null;
@@ -51,7 +62,11 @@ export async function getBotUsername() {
  * не на каждом старте сервера, чтобы не дёргать API Telegram лишний раз.
  */
 export async function setWebhook(url) {
-  return callTelegramApi("setWebhook", { url });
+  const secret = webhookSecret();
+  if (!validWebhookSecret(secret, secret)) throw new Error('TELEGRAM_WEBHOOK_SECRET должен содержать 32–256 символов A-Z, a-z, 0-9, _ или -.');
+  const result = await callTelegramApi("setWebhook", { url, secret_token: secret });
+  if (!result?.ok) throw new Error('Telegram не подтвердил регистрацию webhook');
+  return result;
 }
 
 /**
@@ -60,13 +75,18 @@ export async function setWebhook(url) {
  */
 export async function handleUpdate(update, { onStartLink }) {
   const message = update?.message;
-  if (!message || !message.text) return;
+  if (!privateSender(message) || typeof message.text !== 'string') return;
 
   const text = message.text.trim();
   const chatId = message.chat.id;
   const telegramId = message.from.id;
 
-  if (text.startsWith("/start")) {
+  if(text==='/id'){
+    await sendMessage(chatId,`Ваш Telegram ID для настройки Brandis: <code>${telegramId}</code>`);
+    return;
+  }
+
+  if (/^\/start(?:\s|$)/.test(text)) {
     const parts = text.split(/\s+/);
     const sessionCode = parts[1];
 

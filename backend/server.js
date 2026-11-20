@@ -12,6 +12,11 @@ import * as billing from "./billing.js";
 import * as yookassa from "./yookassa.js";
 import * as telegram from "./telegram.js";
 import * as history from "./history.js";
+import { validWebhookSecret, linkIsFresh, webhookSecret } from './auth-security.js';
+import { initVerificationSchema, registerVerificationRoutes } from './verification.js';
+import { applyVerificationPayment } from './verification-payments.js';
+import { registerCatalogRoutes } from './catalog-priority.js';
+import { initOffersSchema, registerOfferRoutes, deliverOffers } from './offers.js';
 
 dotenv.config();
 
@@ -398,9 +403,33 @@ async function requireAuth(req, res, next) {
 }
 
 // ---------- Авторизация через Telegram ----------
+app.get('/api/features',(req,res)=>res.set('Cache-Control','no-store').json({
+    verification:process.env.VERIFICATION_ENABLED==='true',
+    catalog_priority:process.env.CATALOG_PRIORITY_ENABLED==='true',
+    offers:process.env.OFFERS_ENABLED==='true',
+}));
+registerCatalogRoutes(app, {
+    getCatalog: category => category === 'brands' ? BRANDS : BLOGGERS,
+    query: db.query,
+    enabled: () => process.env.VERIFICATION_ENABLED === 'true',
+});
+registerOfferRoutes(app, {requireAuth, pool:db.pool, query:db.query,
+    enabled:()=>process.env.VERIFICATION_ENABLED==='true' && process.env.OFFERS_ENABLED==='true'});
+registerVerificationRoutes(app, {requireAuth, query:db.query,
+    getProfiles:()=>[...BLOGGERS,...BRANDS],
+    enabled:() => process.env.VERIFICATION_ENABLED === 'true', pool:db.pool, provider:yookassa,
+    readDescription:telegram.getPublicProfileDescription,
+    paymentsEnabled:(telegramId) => process.env.VERIFICATION_PAYMENTS_ENABLED === 'true' &&
+      (!(process.env.VERIFICATION_PILOT_IDS||'').trim() || process.env.VERIFICATION_PILOT_IDS.split(',').map(x=>x.trim()).includes(String(telegramId))),
+    returnUrl:() => (process.env.SITE_BASE_URL || PUBLIC_BASE_URL) + '/me?verification=return',
+    adminIds:() => (process.env.VERIFICATION_ADMIN_IDS || '').split(',').map(x=>x.trim()).filter(Boolean)});
+
 app.post("/api/auth/start", async (req, res) => {
     try {
           const sessionCode = req.body?.session_code || crypto.randomUUID();
+          if (typeof sessionCode !== 'string' || !/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i.test(sessionCode)) {
+              return res.status(400).json({ error: 'Обновите страницу для создания новой ссылки входа.' });
+          }
           await db.createPendingLink(sessionCode);
           const botUsername = await telegram.getBotUsername();
           res.json({ session_code: sessionCode, bot_username: botUsername });
@@ -415,7 +444,7 @@ app.get("/api/auth/status", async (req, res) => {
           const sessionCode = req.query.session_code;
           if (!sessionCode) return res.status(400).json({ error: "session_code обязателен" });
           const link = await db.getPendingLink(sessionCode);
-          if (!link) return res.status(404).json({ error: "Ссылка не найдена или устарела" });
+          if (!linkIsFresh(link)) return res.status(404).json({ error: "Ссылка не найдена или устарела" });
           if (link.linked_at) {
                   const user = await db.getUser(link.telegram_id);
                   return res.json({ linked: true, access_token: user?.access_token || null });
@@ -429,11 +458,14 @@ app.get("/api/auth/status", async (req, res) => {
 
 // Вебхук от Telegram — получает /start <session_code> и привязывает telegram_id к сессии.
 app.post("/api/telegram/webhook", async (req, res) => {
+    if (!validWebhookSecret(req.get('X-Telegram-Bot-Api-Secret-Token'), webhookSecret())) {
+        return res.sendStatus(403);
+    }
     try {
           await telegram.handleUpdate(req.body, {
                   onStartLink: async ({ sessionCode, telegramId, username, firstName }) => {
                             const link = await db.getPendingLink(sessionCode);
-                            if (!link) return { linked: false };
+                            if (!linkIsFresh(link) || link.linked_at) return { linked: false };
                             let user = await db.getOrCreateUser(telegramId, { username, firstName });
                             if (!user.access_token) {
                                         user = await db.updateUser(telegramId, { access_token: crypto.randomUUID() + crypto.randomUUID() });
@@ -669,6 +701,10 @@ app.post("/api/billing/webhook", async (req, res) => {
 
       // Не доверяем телу вебхука напрямую — авторитетно перепроверяем статус в самой ЮKassa.
       const payment = await yookassa.getPayment(objId);
+      if (payment.metadata?.type === 'verification') {
+          await applyVerificationPayment(db.pool,payment);
+          return res.sendStatus(200);
+      }
 
       const existing = await db.getPaymentByYookassaId(payment.id);
           if (existing && existing.status === payment.status) {
@@ -695,6 +731,10 @@ app.use(express.static(path.join(__dirname, "..", "frontend")));
 async function start() {
     try {
           await db.initSchema();
+          if (process.env.VERIFICATION_ENABLED === 'true') {
+              await initVerificationSchema(db.query);
+              await initOffersSchema(db.query);
+          }
     } catch (err) {
           console.error("Не удалось инициализировать схему БД (проверь DATABASE_URL):", err);
     }
@@ -712,6 +752,18 @@ async function start() {
   app.listen(PORT, () => {
         console.log(`Brandis AI backend запущен на порту ${PORT}`);
   });
+  if(process.env.VERIFICATION_ENABLED==='true' && process.env.OFFERS_ENABLED==='true'){
+    let delivering=false;
+    const tick=async()=>{
+      if(delivering)return;
+      delivering=true;
+      try{await deliverOffers({query:db.query,sendMessage:telegram.sendMessage});}
+      catch{console.error('Не удалось обработать очередь предложений.');}
+      finally{delivering=false;}
+    };
+    setInterval(tick,15000).unref();
+    void tick();
+  }
 }
 
 start();

@@ -19,14 +19,14 @@ async function main() {
   assert.equal(access.billedAs, "free");
   console.log("✓ Новый пользователь получает бесплатный поиск");
 
-  // --- 2. После использования бесплатного поиска — блок с cta=subscribe ---
+  // --- 2. После использования бесплатного поиска — блок с cta=pack ---
   await billing.recordSearchCompleted(tid, { billedAs: "free", intent: "brand_to_blogger", model: "test", inputTokens: 100, outputTokens: 200 });
   user = await db.getUser(tid);
   assert.equal(user.free_search_used, true);
   access = billing.checkAccess(user);
   assert.equal(access.allowed, false);
-  assert.equal(access.cta, "subscribe");
-  console.log("✓ После бесплатного поиска доступ заблокирован с cta=subscribe");
+  assert.equal(access.cta, "pack");
+  console.log("✓ После бесплатного поиска доступ заблокирован с cta=pack");
 
   // --- 3. Активная подписка: 50 доступных поисков ---
   const now = new Date();
@@ -51,8 +51,8 @@ async function main() {
   assert.equal(user.searches_used_this_period, 50);
   access = billing.checkAccess(user);
   assert.equal(access.allowed, false);
-  assert.equal(access.cta, "addon");
-  console.log("✓ После 50 поисков в периоде — заблокировано с cta=addon");
+  assert.equal(access.cta, "pack");
+  console.log("✓ После 50 поисков в периоде — заблокировано с cta=pack");
 
   // --- 5. Докупленный пакет открывает доступ, списывается корректно ---
   await db.query(`UPDATE users SET addon_searches_remaining = 20 WHERE telegram_id = $1`, [tid]);

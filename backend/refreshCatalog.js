@@ -22,7 +22,7 @@ const RECID = 1241984746;
 const PAGE_SIZE = 100;
 const MAX_PAGES = 200; // страховка от бесконечного цикла, если API поменяет формат
 
-async function fetchCategoryPage(categoryLabel, page) {
+async function fetchCategoryPage(categoryLabel, page, createdOrder=false) {
   const params = new URLSearchParams({
     storepartuid: String(ROOT_PARTUID),
     recid: String(RECID),
@@ -35,11 +35,13 @@ async function fetchCategoryPage(categoryLabel, page) {
     flag_root: "withroot",
   });
   params.append("filters[storepartuid][0]", categoryLabel);
+  if(createdOrder)params.append('sort[created]','desc');
 
 const url = `https://store.tildaapi.com/api/getproductslist/?${params.toString()}`;
   // Tilda отдаёт 403 без правдоподобных браузерных заголовков (Referer/Origin/User-Agent) —
 // API формально публичный, но проверяет, что запрос похож на запрос с самого сайта.
 const res = await fetch(url, {
+  signal:AbortSignal.timeout(30000),
   headers: {
     Accept: "application/json",
     Referer: "https://brandisapp.ru/catalog",
@@ -54,14 +56,14 @@ const res = await fetch(url, {
   return res.json();
 }
 
-async function fetchAllProducts(categoryLabel) {
+async function fetchAllProducts(categoryLabel, createdOrder=false) {
   const all = [];
   const seenUids = new Set();
   let page = 1;
   let total = null;
 
 while (page <= MAX_PAGES) {
-  const data = await fetchCategoryPage(categoryLabel, page);
+  const data = await fetchCategoryPage(categoryLabel, page, createdOrder);
   if (total === null) total = data.total;
   const products = data.products || [];
   if (products.length === 0) break;
@@ -87,7 +89,8 @@ function getCharacteristicValues(product, title) {
   return (product.characteristics || [])
   .filter((c) => c.title === title)
   .map((c) => c.value)
-  .filter(Boolean);
+  .filter(Boolean)
+  .flatMap(value=>title==='Контакт'?[value]:String(value).split(';').map(x=>x.trim()).filter(Boolean));
 }
 
 // Города люди пишут руками, поэтому в каталоге живут «Санкт- Петербург», «спб» и двойные
@@ -134,9 +137,10 @@ function normalizeUrl(link) {
   return `https://${trimmed}`;
 }
 
-function parseFollowers(descr) {
+export function parseFollowers(descr) {
   if (!descr) return null;
-  const m = descr.replace(/ /g, " ").match(/([\d\s.,]+)\s*(тыс\.?)?\s*подписч/i);
+  const plain=descr.replace(/&(?:nbsp|#160|#x0*a0);/gi,' ').replace(/<[^>]*>/g,' ');
+  const m = plain.match(/([\d\s.,]+)\s*(тыс\.?)?\s*подписч/i);
   if (!m) return null;
   const numStr = m[1].replace(/\s/g, "").replace(",", ".");
   let num = parseFloat(numStr);
@@ -151,7 +155,15 @@ function parseFollowers(descr) {
 // поле освободили — теперь у каждой карточки есть свой индексируемый адрес.
 // product.url больше НЕ годится как контакт: там теперь наш же tproduct-адрес.
 
-function transformBlogger(product) {
+function cardMetadata(product) {
+  let gallery=[];
+  try { gallery=typeof product.gallery==='string'?JSON.parse(product.gallery):product.gallery||[]; } catch {}
+  return {uid:String(product.uid),catalog_url:product.url || null,
+    photo:gallery[0]?.img || product.editions?.[0]?.img || null,
+    description:product.descr || '',price:Number(product.price)||0};
+}
+
+export function transformBlogger(product) {
   const cities = getCharacteristicValues(product, "Город").map(normalizeCity).filter(Boolean);
   const niches = shortenNiches(getCharacteristicValues(product, "Сфера (тематика)"));
   const platforms = getCharacteristicValues(product, "Платформа");
@@ -174,6 +186,7 @@ const name = (product.title || "").trim();
   if (!name) return null;
 
 return {
+  ...cardMetadata(product),
   name,
   city: city || null,
   niche: niches,
@@ -188,7 +201,7 @@ return {
 };
 }
 
-function transformBrand(product) {
+export function transformBrand(product) {
   const cities = getCharacteristicValues(product, "Город").map(normalizeCity).filter(Boolean);
   const niches = shortenNiches(getCharacteristicValues(product, "Сфера (тематика)"));
   const contact = normalizeUrl(getCharacteristicValues(product, "Контакт")[0] || product.buttonlink);
@@ -198,6 +211,7 @@ const name = (product.title || "").trim();
   if (!name) return null;
 
 return {
+  ...cardMetadata(product),
   name,
   city: city || null,
   niche: niches,
@@ -205,6 +219,8 @@ return {
   // Открытый API Тильды такого текста не отдаёт, зато у карточки бренда почти всегда
   // есть ссылка (сайт/соцсеть) — используем её, это не хуже как способ связаться.
   contact,
+  profile_url:contact,
+  platform:getCharacteristicValues(product,"Платформа")[0] || null,
 };
 }
 
@@ -213,9 +229,14 @@ return {
 export async function fetchCatalog() {
   const [{ products: bloggerProducts, total: bloggersTotal }, { products: brandProducts, total: brandsTotal }] =
     await Promise.all([fetchAllProducts("Блогеры"), fetchAllProducts("Бренды")]);
+  const [newBloggers,newBrands]=await Promise.all([fetchAllProducts('Блогеры',true),fetchAllProducts('Бренды',true)]);
+  const withOrder=(products,newProducts,transform)=>{
+    const ranks=new Map(newProducts.map((p,index)=>[String(p.uid),index]));
+    return products.map(transform).filter(Boolean).map(p=>({...p,created_rank:ranks.get(p.uid)??null}));
+  };
   return {
-    bloggers: bloggerProducts.map(transformBlogger).filter(Boolean),
-    brands: brandProducts.map(transformBrand).filter(Boolean),
+    bloggers: withOrder(bloggerProducts,newBloggers.products,transformBlogger),
+    brands: withOrder(brandProducts,newBrands.products,transformBrand),
     bloggersTotal,
     brandsTotal,
   };

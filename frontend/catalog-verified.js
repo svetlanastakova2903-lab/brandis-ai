@@ -23,7 +23,8 @@
     if(!response.ok)throw new Error(data.error||'Не удалось выполнить запрос. Попробуйте ещё раз.');return data;
   }
   function button(label,parent,action){const b=el('button',label,parent);b.type='button';b.onclick=action;return b;}
-  root.replaceChildren();el('h1','Блогеры и бренды для коллабораций',root);
+  root.replaceChildren();
+  if(!document.getElementById('rec1241984746'))el('h1','Блогеры и бренды для коллабораций',root);
   el('p','Подтверждённые владельцы отмечены ✦ и показаны первыми среди подходящих анкет.',root);
   const login=el('a','Войти через Telegram / кабинет',root);login.href=site+'/me';
   const tabs=el('div',null,root);tabs.className='bc-tabs';

@@ -47,7 +47,24 @@
     if(facetsCategory===state.category)return;facetsCategory=state.category;facetRoot.replaceChildren();
     for(const [field,label] of [['city','Город'],['niche','Тематика'],['platform','Платформа']]){
       const details=el('details',null,facetRoot);el('summary',label,details);const list=el('div',null,details);list.className='bc-options';
-      for(const value of data[field]||[]){const l=el('label',null,list);const c=el('input',null,l);c.type='checkbox';c.checked=state[field].includes(value);l.append(document.createTextNode(' '+value));c.onchange=()=>{state[field]=c.checked?[...state[field],value]:state[field].filter(x=>x!==value);state.page=1;load();};}
+      const groups=new Map();
+      const countries={
+        'Россия':'Архангельск|Воронеж|Выкса|Екатеринбург|Казань|Калининград|Калуга|Краснодар|Курск|Липецк|Москва|Нижний Новгород|Новоалтайск|Новороссийск|Новосибирск|Новошахтинск|Омск|Пермь|Рязань|Санкт-Петербург|Саратов|Сочи|Тюмень|Ханты-Мансийск|Чебоксары|Челябинск|Тула|Суздаль',
+        'Вьетнам':'Нячанг|Ханой|Хошимин|Дананг|Далат|Фукуок',
+        'Казахстан':'Астана|Костанай|Алматы|Казахстан',
+        'Грузия':'Батуми|Тбилиси', 'Сербия':'Белград', 'Кыргызстан':'Бишкек',
+        'Австрия':'Вена','Китай':'Гонконг|Шанхай|Яншо', 'Сингапур':'Сингапур',
+        'Индонезия':'Bali|Бали', 'Таиланд':'Бангкок|Пхукет|Самуи', 'ОАЭ':'Дубай|Dubai'
+      };
+      for(const value of data[field]||[]){
+        const country=field==='city'?(Object.entries(countries).find(([,cities])=>cities.split('|').includes(value))?.[0]||'Другие / уточняем страну'):'';
+        if(!groups.has(country))groups.set(country,[]);groups.get(country).push(value);
+      }
+      for(const [country,values] of [...groups].sort(([a],[b])=>a==='Россия'?-1:b==='Россия'?1:a.localeCompare(b,'ru'))){
+        const group=country?el('details',null,list):list;
+        if(country){group.className='bc-country';el('summary',country+' · '+values.length,group);group.open=values.some(value=>state[field].includes(value));}
+        for(const value of values){const l=el('label',null,group);const c=el('input',null,l);c.type='checkbox';c.checked=state[field].includes(value);l.append(document.createTextNode(' '+value));c.onchange=()=>{state[field]=c.checked?[...state[field],value]:state[field].filter(x=>x!==value);state.page=1;load();};}
+      }
     }
   }
   async function favorite(item,b){

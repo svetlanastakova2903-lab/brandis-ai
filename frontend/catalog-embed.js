@@ -6,12 +6,14 @@
     // Native Tilda remains the public catalogue while the replacement is in preview.
     const decorate=()=>{
       for(const card of native.querySelectorAll('.js-product[data-product-uid]')){
-        const uid=card.getAttribute('data-product-uid');if(!uid||card.querySelector('.brandis-claim'))continue;
+        const uid=card.getAttribute('data-product-uid');if(!uid)continue;
+        const actions=card.querySelector('.t-store__card__btns-wrapper')||card.querySelector('.bdz-fav')?.parentElement;
+        if(!actions || actions.querySelector('.brandis-claim'))continue;
         const link=document.createElement('a');link.className='brandis-claim';link.textContent='Это моя анкета';
         link.href='/me?claim='+encodeURIComponent(uid)+'#brandis-verification';
-        link.style.cssText='display:block;margin:12px 0;color:#aaa398;font-size:12px;text-align:center;position:relative;z-index:2';
+        link.style.cssText='display:flex;align-items:center;justify-content:center;box-sizing:border-box;width:100%;min-height:44px;margin-top:8px;padding:6px 10px;border:1px solid #aa795d;border-radius:20px;color:#f2ede4;font-family:inherit;font-size:14px;font-weight:600;text-decoration:none;position:relative;z-index:2';
         link.addEventListener('click',event=>event.stopPropagation());
-        (card.querySelector('.t-store__card__textwrapper')||card).append(link);
+        actions.append(link);
       }
     };
     decorate();let scheduled=false;

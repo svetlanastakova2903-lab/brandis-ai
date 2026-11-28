@@ -32,13 +32,14 @@ test('selected card survives Telegram login and saves only after confirmation',a
  }finally{dom.window.close();}
 });
 test('native Tilda cards receive one claim link after dynamic rendering',async()=>{
- const dom=new JSDOM('<div id="rec1241984746"><div class="js-product" data-product-uid="123"><div class="t-store__card__textwrapper"></div></div></div>',{url:'https://brandisapp.ru/catalog',runScripts:'outside-only',pretendToBeVisual:true});
+ const dom=new JSDOM('<div id="rec1241984746"><div class="js-product" data-product-uid="123"><div class="t-store__card__textwrapper"></div><div class="t-store__card__btns-wrapper"><button class="bdz-fav">В избранное</button></div></div></div>',{url:'https://brandisapp.ru/catalog',runScripts:'outside-only',pretendToBeVisual:true});
  try{
    dom.window.fetch=async()=>({ok:true,json:async()=>({catalog_priority:false})});
    dom.window.eval(fs.readFileSync(new URL('../frontend/catalog-embed.js',import.meta.url),'utf8'));
    dom.window.document.dispatchEvent(new dom.window.Event('DOMContentLoaded'));await tick();
    const card=dom.window.document.querySelector('.js-product');
    assert.equal(card.querySelectorAll('.brandis-claim').length,1);
+   assert.equal(card.querySelector('.bdz-fav').nextElementSibling.className,'brandis-claim');
    assert.match(card.querySelector('.brandis-claim').href,/\/me\?claim=123#/);
    card.append(dom.window.document.createElement('span'));await tick();
    assert.equal(card.querySelectorAll('.brandis-claim').length,1);

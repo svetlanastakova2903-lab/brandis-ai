@@ -3,6 +3,19 @@
   const start=async()=>{
     if(document.getElementById('brandis-catalog'))return;
     const native=document.getElementById('rec1241984746');if(!native)return;
+    // Native Tilda remains the public catalogue while the replacement is in preview.
+    const decorate=()=>{
+      for(const card of native.querySelectorAll('.js-product[data-product-uid]')){
+        const uid=card.getAttribute('data-product-uid');if(!uid||card.querySelector('.brandis-claim'))continue;
+        const link=document.createElement('a');link.className='brandis-claim';link.textContent='Это моя анкета';
+        link.href='/me?claim='+encodeURIComponent(uid)+'#brandis-verification';
+        link.style.cssText='display:block;margin:12px 0;color:#aaa398;font-size:12px;text-align:center;position:relative;z-index:2';
+        link.addEventListener('click',event=>event.stopPropagation());
+        (card.querySelector('.t-store__card__textwrapper')||card).append(link);
+      }
+    };
+    decorate();let scheduled=false;
+    new MutationObserver(()=>{if(scheduled)return;scheduled=true;requestAnimationFrame(()=>{scheduled=false;decorate();});}).observe(native,{childList:true,subtree:true});
     const api=window.BRANDIS_API_URL||'https://brandis-ai.onrender.com';
     try{
       const response=await fetch(api+'/api/features',{signal:AbortSignal.timeout(65000)});

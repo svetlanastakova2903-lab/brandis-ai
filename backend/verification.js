@@ -51,6 +51,11 @@ export async function initVerificationSchema(query) {
     ADD COLUMN IF NOT EXISTS reviewed_at TIMESTAMPTZ,
     ADD COLUMN IF NOT EXISTS review_note TEXT`);
   await query(`ALTER TABLE verification_claims ADD COLUMN IF NOT EXISTS offers_enabled BOOLEAN NOT NULL DEFAULT false`);
+  await query(`ALTER TABLE verification_claims ADD COLUMN IF NOT EXISTS catalog_uid TEXT`);
+  await query(`CREATE TABLE IF NOT EXISTS profile_selections (
+    telegram_id BIGINT PRIMARY KEY REFERENCES users(telegram_id),
+    catalog_uid TEXT NOT NULL, updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+  )`);
   // Multiple people may claim a profile, but only one may ever own its verified badge.
   await query(`CREATE UNIQUE INDEX IF NOT EXISTS verification_verified_profile
     ON verification_claims(profile_url) WHERE status = 'verified'`);
@@ -63,6 +68,29 @@ export function containsProof(description, code) {
 
 export function registerVerificationRoutes(app, {requireAuth, query, enabled, pool, provider, returnUrl, getProfiles=()=>[], readDescription=async()=>null, paymentsEnabled=()=>false, adminIds=()=>[]}) {
   const available = (req,res,next) => enabled() ? next() : res.status(503).json({error:'Верификация пока не открыта.'});
+  const findCard = uid => typeof uid==='string' && /^[0-9]{1,30}$/.test(uid) ? getProfiles().find(item => String(item.uid) === uid) : undefined;
+  const publicCard = item => item ? {uid:String(item.uid),name:item.name,photo:item.photo,
+    contact:item.profile_url||item.contact,city:item.city} : null;
+  app.get('/api/verification/catalog/:uid', available, (req,res) => {
+    const item=findCard(req.params.uid);
+    if(!item)return res.status(404).json({error:'Анкета не найдена. Выберите её заново в каталоге.'});
+    res.json({profile:publicCard(item)});
+  });
+  app.get('/api/verification/selection', available, requireAuth, async(req,res)=>{
+    try{
+      const {rows:[row]}=await query('SELECT catalog_uid FROM profile_selections WHERE telegram_id=$1',[req.telegramId]);
+      res.json({profile:row ? publicCard(findCard(row.catalog_uid)) : null, missing:!!row&&!findCard(row.catalog_uid)});
+    }catch{res.status(500).json({error:'Не удалось загрузить выбранную анкету.'});}
+  });
+  app.post('/api/verification/selection', available, requireAuth, async(req,res)=>{
+    const item=findCard(req.body?.catalog_uid);
+    if(!item)return res.status(404).json({error:'Анкета не найдена. Выберите её заново в каталоге.'});
+    try{
+      await query(`INSERT INTO profile_selections (telegram_id,catalog_uid) VALUES ($1,$2)
+        ON CONFLICT (telegram_id) DO UPDATE SET catalog_uid=EXCLUDED.catalog_uid,updated_at=now()`,[req.telegramId,String(item.uid)]);
+      res.json({profile:publicCard(item)});
+    }catch{res.status(500).json({error:'Не удалось сохранить выбранную анкету.'});}
+  });
   app.get('/api/verification/me', available, requireAuth, async (req,res) => {
     try {
       const {rows} = await query(`SELECT *
@@ -72,18 +100,23 @@ export function registerVerificationRoutes(app, {requireAuth, query, enabled, po
   });
   app.post('/api/verification/claims', available, requireAuth, async (req,res) => {
     let data;
-    try { data = validateClaim(req.body); }
+    try {
+      const selected=req.body?.catalog_uid ? findCard(req.body.catalog_uid) : null;
+      if(req.body?.catalog_uid && !selected)throw new Error('Выбранная анкета не найдена в каталоге.');
+      data = validateClaim(selected ? {...req.body,profile_url:selected.profile_url||selected.contact} : req.body);
+      data.catalogUid=selected ? String(selected.uid) : null;
+    }
     catch (error) { return res.status(400).json({error:error.message}); }
     if(!getProfiles().some(item=>profileKey(item.profile_url||item.contact)===profileKey(data.profileUrl)))return res.status(409).json({error:'Сначала добавьте анкету в каталог Brandis. Проверка оплачивается после её размещения.'});
     try {
       const {rows:[owner]}=await query(`SELECT telegram_id FROM verification_claims WHERE profile_url=$1 AND status='verified'`,[data.profileUrl]);
       if(owner && String(owner.telegram_id)!==String(req.telegramId))return res.status(409).json({error:'У этой анкеты уже подтверждён владелец. Для изменения владельца обратитесь в поддержку.'});
       const {rows} = await query(`INSERT INTO verification_claims
-        (id,telegram_id,profile_url,phone,proof_code)
-        VALUES ($1,$2,$3,$4,$5)
-        ON CONFLICT (telegram_id,profile_url) DO UPDATE SET profile_url=EXCLUDED.profile_url
+        (id,telegram_id,profile_url,phone,proof_code,catalog_uid)
+        VALUES ($1,$2,$3,$4,$5,$6)
+        ON CONFLICT (telegram_id,profile_url) DO UPDATE SET catalog_uid=COALESCE(verification_claims.catalog_uid,EXCLUDED.catalog_uid)
         RETURNING *`,
-        [crypto.randomUUID(),req.telegramId,data.profileUrl,data.phone,'BRANDIS-'+crypto.randomBytes(8).toString('hex').toUpperCase()]);
+        [crypto.randomUUID(),req.telegramId,data.profileUrl,data.phone,'BRANDIS-'+crypto.randomBytes(8).toString('hex').toUpperCase(),data.catalogUid]);
       res.status(200).json({claim:publicClaim(rows[0])});
     } catch { res.status(500).json({error:'Не удалось сохранить заявку.'}); }
   });

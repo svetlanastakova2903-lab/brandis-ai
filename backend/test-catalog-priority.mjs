@@ -55,3 +55,9 @@ test('profile matching ignores tracking but preserves YouTube channel ID case', 
   assert.notEqual(profileKey('https://youtube.com/channel/AbC'), profileKey('https://youtube.com/channel/abc'));
   assert.equal(profileKey('javascript:alert(1)'),null);
 });
+
+test('card-bound verification does not promote duplicate URLs or a changed profile',()=>{
+ const items=[{uid:'1',name:'One',contact:'https://instagram.com/example'},{uid:'2',name:'Duplicate',contact:'https://instagram.com/example'},{uid:'3',name:'Changed',contact:'https://instagram.com/new'}];
+ const claims=[{catalog_uid:'1',profile_url:items[0].contact,status:'verified',paid_at:'2026-11-28'},{catalog_uid:'3',profile_url:items[0].contact,status:'verified',paid_at:'2026-11-28'}];
+ assert.deepEqual(selectCatalog(items,claims).items.map(x=>x.verified),[true,false,false]);
+});

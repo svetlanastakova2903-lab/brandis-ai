@@ -26,7 +26,7 @@
   root.replaceChildren();
   if(!document.getElementById('rec1241984746'))el('h1','Блогеры и бренды для коллабораций',root);
   el('p','Подтверждённые владельцы отмечены ✦ и показаны первыми среди подходящих анкет.',root);
-  const login=el('a','Войти через Telegram / кабинет',root);login.href=site+'/me';
+  const login=el('a',token()?'Личный кабинет':'Войти через Telegram',root);login.href=site+'/me';
   const tabs=el('div',null,root);tabs.className='bc-tabs';
   const categoryButtons={};
   for(const [value,label] of [['bloggers','Блогеры'],['brands','Бренды']])categoryButtons[value]=button(label,tabs,()=>{state.category=value;state.page=1;state.city=[];state.niche=[];state.platform=[];load();});
@@ -79,6 +79,7 @@
     el('p',[item.city,(item.niche||[]).join(', '),item.platform].filter(Boolean).join(' · '),article);
     if(Number.isFinite(item.followers))el('p',item.followers.toLocaleString('ru')+' подписчиков',article);
     if(href){const a=el('a','Подробнее',article);a.href=href;}
+    if(item.uid){const claim=el('a','Это моя анкета',article);claim.href=site+'/me?claim='+encodeURIComponent(item.uid)+'#brandis-verification';claim.className='bc-claim';}
     if(item.uid){const fav=button(favorites.has(item.uid)?'★ В избранном':'☆ В избранное',article,()=>favorite(item,fav));}
     if(item.verified&&item.accepts_offers){const b=button('Написать',article,()=>openOffer(item));b.className='bc-send';}
   }

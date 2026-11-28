@@ -23,9 +23,12 @@ function values(value) {
 
 export function selectCatalog(items, claims, filters = {}) {
   const verified = new Map();
+  const verifiedByUid = new Map();
   for (const claim of claims) {
     const key = profileKey(claim.profile_url);
-    if (key && claim.status === 'verified' && claim.paid_at) verified.set(key, claim);
+    if (key && claim.status === 'verified' && claim.paid_at) {
+      if(claim.catalog_uid)verifiedByUid.set(String(claim.catalog_uid),claim);else verified.set(key,claim);
+    }
   }
   const options = {};
   for (const field of ['city', 'niche', 'platform']) options[field] = values(filters[field]);
@@ -37,7 +40,8 @@ export function selectCatalog(items, claims, filters = {}) {
     if (search && !text([item.name, item.city, ...values(item.niche)].join(' ')).includes(search)) return false;
     return true;
   }).map((item, index) => {
-    const claim = verified.get(profileKey(item.profile_url || item.contact));
+    const candidate = verifiedByUid.get(String(item.uid));
+    const claim = candidate && profileKey(candidate.profile_url)===profileKey(item.profile_url||item.contact) ? candidate : verified.get(profileKey(item.profile_url || item.contact));
     return { ...item, verified: Boolean(claim), verification_id: claim?.id || null, accepts_offers:claim?.offers_enabled===true, originalIndex: index };
   });
   matched.sort((a, b) => {
@@ -71,7 +75,7 @@ export function registerCatalogRoutes(app, { getCatalog, query, enabled }) {
     const category = req.query.category || 'bloggers';
     if (!['bloggers', 'brands'].includes(category)) return res.status(400).json({ error: 'Неизвестный раздел каталога.' });
     try {
-      const claims = enabled() ? (await query(`SELECT id,profile_url,status,paid_at,offers_enabled FROM verification_claims WHERE status='verified' AND paid_at IS NOT NULL`)).rows : [];
+      const claims = enabled() ? (await query(`SELECT id,catalog_uid,profile_url,status,paid_at,offers_enabled FROM verification_claims WHERE status='verified' AND paid_at IS NOT NULL`)).rows : [];
       res.set('Cache-Control', 'no-store');
       const items=getCatalog(category);
       const facets={};

@@ -43,6 +43,7 @@
     <li><strong>Получите звёздочку</strong><span>Нажмите «Проверить профиль». После подтверждения код можно удалить.</span></li>
   </ol>
   <p class="terms">Если автоматическая проверка недоступна, проверим вручную за 3–5 рабочих дней после отправки заявки. Если подтвердить владельца не получится — вернём оплату. Повторно платить не нужно.</p>
+  <div id="bv-selection" aria-live="polite"></div>
   <form id="bv-form">
     <label>Ссылка на профиль из вашей анкеты<input name="profile_url" type="url" required placeholder="https://t.me/your_profile" maxlength="500"></label>
     <label><input name="contact_consent" type="checkbox" required> Можно связаться со мной в Telegram по поводу проверки.</label>
@@ -82,8 +83,36 @@
       for(const [decision,title] of [['verified','Код совпадает — подтвердить'],['needs_information','Запросить уточнение'],['refund_pending','Передать на возврат']])button(card,title,async()=>{await request('/review/'+claim.id,{decision,note:note.value});await refresh();});
     }
   }
+  const selection=root.querySelector('#bv-selection');
+  let selectedProfile=null;
+  let requestedUid=new URLSearchParams(location.search).get('claim');
+  function showSelection(profile){
+    selectedProfile=profile;selection.replaceChildren();form.elements.profile_url.readOnly=!!profile;form.elements.profile_url.value=profile?.contact||'';
+    if(!profile){const a=text(selection,'a','Найти свою анкету в каталоге');a.href='/catalog';return;}
+    text(selection,'h3',profile.name);
+    if(profile.photo && /^https:\/\//i.test(profile.photo)){const img=document.createElement('img');img.src=profile.photo;img.alt=profile.name;img.style.cssText='width:96px;height:96px;object-fit:cover;border-radius:12px';selection.append(img);}
+    text(selection,'p',profile.city||'');text(selection,'p',profile.contact||'');
+    text(selection,'p','Выбор анкеты не подтверждает владение. Отметка появится после отдельной проверки.');
+    const a=text(selection,'a','Выбрать другую анкету');a.href='/catalog';
+    form.elements.profile_url.value=profile.contact||'';form.elements.profile_url.readOnly=true;
+  }
+  async function loadSelection(){
+    if(requestedUid){
+      const response=await fetch(api+'/api/verification/catalog/'+encodeURIComponent(requestedUid));
+      const data=await response.json();if(!response.ok)throw new Error(data.error||'Анкета не найдена.');
+      showSelection(data.profile);form.hidden=true;
+      button(selection,'Да, это моя анкета',async()=>{
+        await request('/selection',{catalog_uid:data.profile.uid});requestedUid=null;form.hidden=false;showSelection(data.profile);
+        const url=new URL(location.href);url.searchParams.delete('claim');history.replaceState(null,'',url);
+        status.textContent='Анкета сохранена в кабинете. Для получения отметки нужно подтвердить владение.';
+      });
+    }else{
+      const data=await request('/selection');showSelection(data.profile);
+      if(data.missing)status.textContent='Ранее выбранная анкета больше не найдена в каталоге.';
+    }
+  }
   async function refresh(){
-    const data=await request('/me');paymentEnabled=data.payments_enabled;claims.replaceChildren();text(claims,'p','Ваш Telegram ID: '+data.telegram_id);
+    const data=await request('/me');status.textContent='';await loadSelection();paymentEnabled=data.payments_enabled;claims.replaceChildren();text(claims,'p','Ваш Telegram ID: '+data.telegram_id);
     for(const claim of data.claims){
       const card=document.createElement('article');claims.append(card);text(card,'h3',claim.profile_url);
       if(claim.status==='awaiting_payment'){
@@ -109,7 +138,7 @@
     }
     await refreshReview();
   }
-  form.onsubmit=async event=>{event.preventDefault();const b=form.querySelector('button');b.disabled=true;try{const data=new FormData(form);await request('/claims',{profile_url:data.get('profile_url'),contact_consent:data.get('contact_consent')==='on'});await refresh();status.textContent='Заявка сохранена.';}catch(e){status.textContent=e.message;}finally{b.disabled=false;}};
+  form.onsubmit=async event=>{event.preventDefault();const b=form.querySelector('button');b.disabled=true;try{const data=new FormData(form);await request('/claims',{profile_url:data.get('profile_url'),catalog_uid:selectedProfile?.uid,contact_consent:data.get('contact_consent')==='on'});await refresh();status.textContent='Заявка сохранена.';}catch(e){status.textContent=e.message;}finally{b.disabled=false;}};
   root.querySelector('#bv-refresh').onclick=()=>refresh().catch(e=>status.textContent=e.message);
   let lastToken=localStorage.getItem('brandis_access_token');
   setInterval(()=>{const next=localStorage.getItem('brandis_access_token');if(next!==lastToken){lastToken=next;refresh().catch(e=>status.textContent=e.message);}},2000);

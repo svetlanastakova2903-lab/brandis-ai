@@ -10,7 +10,7 @@ export function matchesVerificationPayment(payment, claim) {
 
 export function publicClaim(row) {
   const {id, profile_url, status, created_at} = row;
-  return {id, profile_url, status, created_at, offers_enabled:row.offers_enabled===true,
+  return {id, profile_url, status, created_at, catalog_uid:row.catalog_uid||null, offers_enabled:row.offers_enabled===true,
     proof_code: row.paid_at && !['refund_pending','refunded','rejected'].includes(status) ? row.proof_code : null};
 }
 
